@@ -59,27 +59,6 @@ type
     l_head* {.importc: "l_head".}: ptr PortMapping ##  list head
     curelt* {.importc: "curelt".}: portMappingElt
 
-proc ParsePortListing*(buffer: cstring; bufsize: cint;
-                      pdata: ptr PortMappingParserData) {.
-    importc: "ParsePortListing", header: "portlistingparse.h".}
-
-proc FreePortListing*(pdata: ptr PortMappingParserData) {.
-    importc: "FreePortListing", header: "portlistingparse.h".}
-
-##############
-# miniwget.h #
-##############
-
-proc miniwget*(a1: cstring; a2: ptr cint; a3: cuint; a4: ptr cint): pointer {.
-    importc: "miniwget", header: "miniwget.h".}
-
-proc miniwget_getaddr*(a1: cstring; a2: ptr cint; a3: cstring; a4: cint; a5: cuint;
-                      a6: ptr cint): pointer {.importc: "miniwget_getaddr",
-    header: "miniwget.h".}
-
-proc parseURL*(a1: cstring; a2: cstring; a3: ptr cushort; a4: cstringArray; a5: ptr cuint): cint {.
-    importc: "parseURL", header: "miniwget.h".}
-
 ##################
 # upnpcommands.h #
 ##################
@@ -397,15 +376,6 @@ type
     IPv6FC* {.importc: "IPv6FC".}: IGDdatas_service ##  tmp
     tmp* {.importc: "tmp".}: IGDdatas_service
 
-# proc IGDstartelt*(a1: pointer; a2: cstring; a3: cint) {.importc: "IGDstartelt",
-    # header: "igd_desc_parse.h".}
-# proc IGDendelt*(a1: pointer; a2: cstring; a3: cint) {.importc: "IGDendelt",
-    # header: "igd_desc_parse.h".}
-# proc IGDdata*(a1: pointer; a2: cstring; a3: cint) {.importc: "IGDdata",
-    # header: "igd_desc_parse.h".}
-# when defined(DEBUG):
-  # proc printIGD*(a1: ptr IGDdatas) {.importc: "printIGD", header: "igd_desc_parse.h".}
-
 #############
 # upnpdev.h #
 #############
@@ -493,12 +463,6 @@ proc upnpDiscoverDevices*(deviceTypes: ptr cstring; delay: cint; multicastif: cs
                          ttl: cuchar; error: ptr cint; searchalltypes: cint): ptr UPNPDev {.
     importc: "upnpDiscoverDevices", header: "miniupnpc.h".}
 
-##  parserootdesc() :
-##  parse root XML description of a UPnP device and fill the IGDdatas
-##  structure.
-proc parserootdesc*(a1: cstring; a2: cint; a3: ptr IGDdatas) {.importc: "parserootdesc",
-    header: "miniupnpc.h".}
-
 ##  structure used to get fast access to urls
 ##  controlURL: controlURL of the WANIPConnection
 ##  ipcondescURL: url of the description of the WANIPConnection
@@ -538,9 +502,6 @@ proc UPNP_GetValidIGD*(devlist: ptr UPNPDev; urls: ptr UPNPUrls; data: ptr IGDda
 proc UPNP_GetIGDFromUrl*(rootdescurl: cstring; urls: ptr UPNPUrls; data: ptr IGDdatas;
                         lanaddr: cstring; lanaddrlen: cint): cint {.
     importc: "UPNP_GetIGDFromUrl", header: "miniupnpc.h".}
-
-proc GetUPNPUrls*(a1: ptr UPNPUrls; a2: ptr IGDdatas; a3: cstring; a4: cuint) {.
-    importc: "GetUPNPUrls", header: "miniupnpc.h".}
 
 proc freeUPNPUrls*(a1: ptr UPNPUrls) {.importc: "FreeUPNPUrls", header: "miniupnpc.h".}
 
