@@ -1,0 +1,12 @@
+nimcache/
+
+# Ignore dynamic, static libs and libtool archive files
+*.so
+*.dylib
+*.a
+*.la
+*.exe
+*.dll
+
+/examples/miniupnpc_test
+

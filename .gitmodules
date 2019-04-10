@@ -1,0 +1,10 @@
+[submodule "vendor/miniupnp"]
+	ignore = dirty
+	branch = master
+	path = vendor/miniupnp
+	url = https://github.com/miniupnp/miniupnp.git
+[submodule "vendor/libnatpmp"]
+	path = vendor/libnatpmp
+	url = https://github.com/miniupnp/libnatpmp.git
+	ignore = dirty
+	branch = master
