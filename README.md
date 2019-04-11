@@ -47,8 +47,6 @@ miniupnpc:
 
 - add IPv6 pinhole helper procs for the Miniupnp type
 
-- "importc" constants from headers instead of copying them
-
 libnatpmp:
 
 - add wrapper

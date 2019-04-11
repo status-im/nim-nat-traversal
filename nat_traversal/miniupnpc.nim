@@ -10,7 +10,7 @@
 # headers and library location #
 ################################
 
-import ospaths
+import ospaths, ./utils
 
 when defined(miniupnpcUseSystemLibs):
   {.passC: staticExec("pkg-config --cflags miniupnpc").}
@@ -64,16 +64,12 @@ type
 ##################
 
 ##  MiniUPnPc return codes :
-#TODO: write a macro for importing constants
-var UPNPCOMMAND_SUCCESSvar {.importc: "UPNPCOMMAND_SUCCESS", header: "upnpcommands.h".}: cint
-let UPNPCOMMAND_SUCCESS* = UPNPCOMMAND_SUCCESSvar
-const
-  # UPNPCOMMAND_SUCCESS* = (0)
-  UPNPCOMMAND_UNKNOWN_ERROR* = (-1)
-  UPNPCOMMAND_INVALID_ARGS* = (-2)
-  UPNPCOMMAND_HTTP_ERROR* = (-3) # not covered by strupnperror()
-  UPNPCOMMAND_INVALID_RESPONSE* = (-4)
-  UPNPCOMMAND_MEM_ALLOC_ERROR* = (-5) # not covered by strupnperror()
+importConst(UPNPCOMMAND_SUCCESS, "upnpcommands.h", cint)
+importConst(UPNPCOMMAND_UNKNOWN_ERROR, "upnpcommands.h", cint)
+importConst(UPNPCOMMAND_INVALID_ARGS, "upnpcommands.h", cint)
+importConst(UPNPCOMMAND_HTTP_ERROR, "upnpcommands.h", cint) # not covered by strupnperror()
+importConst(UPNPCOMMAND_INVALID_RESPONSE, "upnpcommands.h", cint)
+importConst(UPNPCOMMAND_MEM_ALLOC_ERROR, "upnpcommands.h", cint) # not covered by strupnperror()
 
 proc UPNP_GetTotalBytesSent*(controlURL: cstring; servicetype: cstring): culonglong {.
     importc: "UPNP_GetTotalBytesSent", header: "upnpcommands.h".}
@@ -352,6 +348,7 @@ proc UPNP_GetPinholePackets*(controlURL: cstring; servicetype: cstring;
 ##  Structure to store the result of the parsing of UPnP
 ##  descriptions of Internet Gateway Devices
 const
+  # can't use importConst() here, because it needs to be available at compile time
   MINIUPNPC_URL_MAXSIZE* = (128)
 
 type
@@ -399,23 +396,20 @@ proc freeUPNPDevlist*(devlist: ptr UPNPDev) {.importc: "freeUPNPDevlist",
 ###############
 
 ##  error codes :
-const
-  UPNPDISCOVER_SUCCESS* = (0)
-  UPNPDISCOVER_UNKNOWN_ERROR* = (-1)
-  UPNPDISCOVER_SOCKET_ERROR* = (-101)
-  UPNPDISCOVER_MEMORY_ERROR* = (-102)
+importConst(UPNPDISCOVER_SUCCESS, "miniupnpc.h", cint)
+importConst(UPNPDISCOVER_UNKNOWN_ERROR, "miniupnpc.h", cint)
+importConst(UPNPDISCOVER_SOCKET_ERROR, "miniupnpc.h", cint)
+importConst(UPNPDISCOVER_MEMORY_ERROR, "miniupnpc.h", cint)
 
 ##  versions :
-const
-  MINIUPNPC_VERSION* = "2.1"
-  MINIUPNPC_API_VERSION* = 17
+importConst(MINIUPNPC_VERSION, "miniupnpc.h", cstring)
+importConst(MINIUPNPC_API_VERSION, "miniupnpc.h", cint)
 
 ##  Source port:
 ##    Using "1" as an alias for 1900 for backwards compatibility
 ##    (presuming one would have used that for the "sameport" parameter)
-const
-  UPNP_LOCAL_PORT_ANY* = 0
-  UPNP_LOCAL_PORT_SAME* = 1
+importConst(UPNP_LOCAL_PORT_ANY, "miniupnpc.h", cint)
+importConst(UPNP_LOCAL_PORT_SAME, "miniupnpc.h", cint)
 
 ##  Structures definitions :
 type

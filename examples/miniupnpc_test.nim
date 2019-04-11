@@ -19,6 +19,7 @@ template checkError(expr, body: untyped): untyped =
       echo res.error
       quit(1)
 
+echo &"miniupnpc-{MINIUPNPC_VERSION}, API version {MINIUPNPC_API_VERSION}"
 var upnp = newMiniupnp()
 upnp.discoverDelay = 200
 echo &"Discovering... (delay={upnp.discoverDelay})"

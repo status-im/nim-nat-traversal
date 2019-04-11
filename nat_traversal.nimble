@@ -1,7 +1,7 @@
 packageName   = "nat_traversal"
 version       = "0.0.1"
 author        = "Status Research & Development GmbH"
-description   = "miniupnp client wrapper"
+description   = "miniupnpc and libnatpmp wrapper"
 license       = "Apache License 2.0 or MIT"
 skipDirs      = @["examples"]
 
