@@ -29,7 +29,7 @@ Regular `nimble install` will be enough, if you're planning on using the system 
 See the [examples](examples) directory.
 
 By default, your code will be linked to bundled static libraries. If you want to dynamically link against your system libraries,
-pass the "-d:miniupnpcUseSystemLibs" flag to the Nim compiler.
+pass the "-d:miniupnpcUseSystemLibs" and/or "-d:libnatpmpUseSystemLibs" flags to the Nim compiler.
 
 Let's see both scenarios in action:
 
@@ -37,8 +37,13 @@ Let's see both scenarios in action:
 nimble buildBundledLibs
 # statically linked against the bundled libminiupnpc.a:
 nim c -r -f examples/miniupnpc_test.nim
-# dynamically linked agains the system libminiupnpc.so:
+# dynamically linked against the system libminiupnpc.so:
 nim c -r -f -d:miniupnpcUseSystemLibs examples/miniupnpc_test.nim
+
+# statically linked against the bundled libnatpmp.a:
+nim c -r -f examples/natpmp_test.nim
+# dynamically linked against the system libnatpmp.so:
+nim c -r -f -d:libnatpmpUseSystemLibs examples/natpmp_test.nim
 ```
 
 ## TODO
@@ -46,10 +51,6 @@ nim c -r -f -d:miniupnpcUseSystemLibs examples/miniupnpc_test.nim
 miniupnpc:
 
 - add IPv6 pinhole helper procs for the Miniupnp type
-
-libnatpmp:
-
-- add wrapper
 
 ## License
 

@@ -9,4 +9,5 @@ nimcache/
 *.dll
 
 /examples/miniupnpc_test
+/examples/natpmp_test
 

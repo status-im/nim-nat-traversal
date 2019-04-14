@@ -11,11 +11,13 @@ requires "nim >= 0.19.0", "result"
 proc compileStaticLibraries() =
   withDir "vendor/miniupnp/miniupnpc":
     exec("make libminiupnpc.a")
+  withDir "vendor/libnatpmp":
+    exec("make libnatpmp.a")
 
 task buildBundledLibs, "build bundled libraries":
   compileStaticLibraries()
 
 task installWithBundledLibs, "install with bundled libs":
   compileStaticLibraries()
-  exec("nimble install")
+  exec("nimble install -y")
 
