@@ -36,7 +36,7 @@ case upnp.selectIGD():
   of IGDNotConnected:
     echo "Internet Gateway Device found but it's not connected. Trying anyway."
   of NotAnIGD:
-    echo "Some device found, but it's recognised as an Internet Gateway Device. Trying anyway."
+    echo "Some device found, but it's not recognised as an Internet Gateway Device. Trying anyway."
 
 echo "Local ip address: ", upnp.lanaddr
 var externalIP: string
