@@ -214,7 +214,7 @@ proc getNatPmpResponse(self: NatPmp, natPmpResponsePtr: ptr natpmpresp_t): Resul
 
   while true:
     FD_ZERO(fds);
-    FD_SET(self.cstruct.s, fds)
+    FD_SET(SocketHandle(self.cstruct.s), fds)
     res = getnatpmprequesttimeout(addr(self.cstruct), addr(timeout))
     if res != 0:
       result.err(strnatpmperr(res))
