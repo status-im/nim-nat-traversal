@@ -10,9 +10,15 @@ requires "nim >= 0.19.0", "result"
 
 proc compileStaticLibraries() =
   withDir "vendor/miniupnp/miniupnpc":
-    exec("make libminiupnpc.a")
+    when defined(windows):
+      exec("mingw32-make -f Makefile.mingw CC=gcc init libminiupnpc.a")
+    else:
+      exec("make libminiupnpc.a")
   withDir "vendor/libnatpmp":
-    exec("make libnatpmp.a")
+    when defined(windows):
+      exec("mingw32-make CC=gcc CFLAGS=\"-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR\" libnatpmp.a")
+    else:
+      exec("make libnatpmp.a")
 
 task buildBundledLibs, "build bundled libraries":
   compileStaticLibraries()
