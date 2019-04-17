@@ -13,6 +13,7 @@
 import ospaths, ./utils
 when defined(windows):
   import winlean
+  {.passC: "-DNATPMP_STATICLIB".}
 else:
   import posix
 
