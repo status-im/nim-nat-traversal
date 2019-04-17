@@ -3,7 +3,7 @@ version       = "0.0.1"
 author        = "Status Research & Development GmbH"
 description   = "miniupnpc and libnatpmp wrapper"
 license       = "Apache License 2.0 or MIT"
-skipDirs      = @["examples"]
+installDirs   = @["vendor"]
 
 ### Dependencies
 requires "nim >= 0.19.0", "result"
@@ -23,7 +23,6 @@ proc compileStaticLibraries() =
 task buildBundledLibs, "build bundled libraries":
   compileStaticLibraries()
 
-task installWithBundledLibs, "install with bundled libs":
+before install:
   compileStaticLibraries()
-  exec("nimble install -y")
 

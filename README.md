@@ -12,13 +12,11 @@ This repository uses submodules for
 one go with `git clone --recurse-submodules <REPO_URL>` or clone it normally
 and then run `git submodule update --init --recursive`.
 
-Custom task that builds the static libraries before installation (optional):
+Install it using Nimble:
 
 ```bash
-nimble installWithBundledLibs
+nimble install
 ```
-
-Regular `nimble install` will be enough, if you're planning on using the system libraries.
 
 ## Dependencies
 
@@ -35,6 +33,7 @@ Let's see both scenarios in action:
 
 ```bash
 nimble buildBundledLibs
+
 # statically linked against the bundled libminiupnpc.a:
 nim c -r -f examples/miniupnpc_test.nim
 # dynamically linked against the system libminiupnpc.so:
