@@ -23,6 +23,9 @@ else:
   # its exported symbols being ignored. We move it into the last position with {.passL.}.
   {.passL: includePath / "libminiupnpc.a".}
 
+when defined(windows):
+  {.passL: "-lws2_32 -liphlpapi".}
+
 ################
 # upnperrors.h #
 ################
