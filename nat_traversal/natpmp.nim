@@ -10,7 +10,11 @@
 # headers and library location #
 ################################
 
-import ospaths, posix, ./utils
+import ospaths, ./utils
+when defined(windows):
+  import winlean
+else:
+  import posix
 
 when defined(libnatpmpUseSystemLibs):
   {.passL: "-lnatpmp".}
