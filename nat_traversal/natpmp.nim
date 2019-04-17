@@ -221,7 +221,7 @@ proc getNatPmpResponse(self: NatPmp, natPmpResponsePtr: ptr natpmpresp_t): Resul
       return
     res = select(FD_SETSIZE, addr(fds), nil, nil, addr(timeout))
     if res == -1:
-      result.err(strerror(errno))
+      result.err(osErrorMsg(osLastError()))
       return
     res = readnatpmpresponseorretry(addr(self.cstruct), natPmpResponsePtr)
     if res < 0 and res != NATPMP_TRYAGAIN:
