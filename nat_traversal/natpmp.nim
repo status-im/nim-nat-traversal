@@ -13,7 +13,6 @@
 import ospaths, ./utils
 when defined(windows):
   import winlean
-  {.passC: "-DNATPMP_STATICLIB".}
 else:
   import posix
 
@@ -23,6 +22,10 @@ else:
   const includePath = currentSourcePath.parentDir().parentDir() / "vendor" / "libnatpmp"
   {.passC: "-I" & includePath.}
   {.passL: includePath / "libnatpmp.a".}
+
+when defined(windows):
+  {.passC: "-DNATPMP_STATICLIB".}
+  {.passL: "-lws2_32 -liphlpapi".}
 
 ############
 # natpmp.h #
