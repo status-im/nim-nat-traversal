@@ -24,6 +24,7 @@ else:
   {.passL: includePath / "libminiupnpc.a".}
 
 when defined(windows):
+  {.passC: "-DMINIUPNP_STATICLIB".}
   {.passL: "-lws2_32 -liphlpapi".}
 
 ################
