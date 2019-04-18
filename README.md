@@ -24,7 +24,9 @@ nimble install
 
 ## Usage
 
-See the [examples](examples) directory.
+See the [examples](examples) directory for some generic usage.
+
+A real-world example, complete with periodic port mapping renewal in a separate thread, is available in [nim-eth](https://github.com/status-im/nim-eth/blob/32bb1f35d75f226938fc560e15690e3251d7f246/eth/net/nat.nim) and [nimbus](https://github.com/status-im/nimbus/blob/a89b0d677a263cac38987ce39b8b066a746d3b99/nimbus/nimbus.nim#L61).
 
 By default, your code will be linked to bundled static libraries. If you want to dynamically link against your system libraries,
 pass the "-d:miniupnpcUseSystemLibs" and/or "-d:libnatpmpUseSystemLibs" flags to the Nim compiler.
