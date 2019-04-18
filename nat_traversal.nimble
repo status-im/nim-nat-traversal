@@ -1,3 +1,5 @@
+mode = ScriptMode.Verbose
+
 packageName   = "nat_traversal"
 version       = "0.0.1"
 author        = "Status Research & Development GmbH"
