@@ -536,6 +536,9 @@ proc newMiniupnp*(): Miniupnp =
   if result.ttl == 0.cuchar:
     result.ttl = 2.cuchar
 
+proc `=deepCopy`(x: Miniupnp): Miniupnp =
+  {.error: "not implemented".}
+
 proc upnpError*(errno: cint): cstring =
   if errno == UPNPCOMMAND_HTTP_ERROR:
     return "Miniupnpc HTTP error"
