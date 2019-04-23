@@ -211,7 +211,7 @@ proc init*(self: NatPmp): Result[bool, cstring] =
     result.err(strnatpmperr(res))
 
 proc `=deepCopy`(x: NatPmp): NatPmp =
-  {.error: "not implemented".}
+  doAssert(false, "not implemented")
 
 proc getNatPmpResponse(self: NatPmp, natPmpResponsePtr: ptr natpmpresp_t): Result[bool, cstring] =
   var
