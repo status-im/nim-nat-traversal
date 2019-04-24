@@ -24,6 +24,7 @@ else:
   {.passL: includePath / "libminiupnpc.a".}
 
 when defined(windows):
+  import nativesockets # for that wsaStartup() call at the end
   {.passC: "-DMINIUPNP_STATICLIB".}
   {.passL: "-lws2_32 -liphlpapi".}
 
@@ -533,10 +534,9 @@ proc miniupnpFinalizer(x: Miniupnp) =
 
 proc newMiniupnp*(): Miniupnp =
   new(result, miniupnpFinalizer)
-  if result.ttl == 0.cuchar:
-    result.ttl = 2.cuchar
+  result.ttl = 2.cuchar
 
-proc `=deepCopy`(x: Miniupnp): Miniupnp =
+proc `=deepCopy`*(x: Miniupnp): Miniupnp =
   doAssert(false, "not implemented")
 
 proc upnpError*(errno: cint): cstring =
@@ -556,9 +556,12 @@ proc discover*(self: Miniupnp): Result[int, cstring] =
   if self.devList != nil:
     freeUPNPDevlist(self.devList)
   self.error = 0
+  var
+    multicastIF = if self.multicastIF.len > 0: self.multicastIF.cstring else: nil
+    miniSsdpdSocket = if self.miniSsdpdSocket.len > 0: self.miniSsdpdSocket.cstring else: nil
   self.devList = upnpDiscover(self.discoverDelay,
-                              self.multicastIF.cstring,
-                              self.minisSdpdSocket.cstring,
+                              multicastIF,
+                              miniSsdpdSocket,
                               self.localPort,
                               self.ipv6,
                               self.ttl,
