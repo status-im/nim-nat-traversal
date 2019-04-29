@@ -24,6 +24,7 @@ else:
   {.passL: includePath / "libnatpmp.a".}
 
 when defined(windows):
+  import nativesockets # for that wsaStartup() call at the end
   {.passC: "-DNATPMP_STATICLIB".}
   {.passL: "-lws2_32 -liphlpapi".}
 
