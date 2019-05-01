@@ -539,13 +539,13 @@ proc newMiniupnp*(): Miniupnp =
 proc `=deepCopy`*(x: Miniupnp): Miniupnp =
   doAssert(false, "not implemented")
 
-proc upnpError*(errno: cint): cstring =
-  if errno == UPNPCOMMAND_HTTP_ERROR:
+proc upnpError*(errorNumber: cint): cstring =
+  if errorNumber == UPNPCOMMAND_HTTP_ERROR:
     return "Miniupnpc HTTP error"
-  elif errno == UPNPCOMMAND_MEM_ALLOC_ERROR:
+  elif errorNumber == UPNPCOMMAND_MEM_ALLOC_ERROR:
     return strupnperror(UPNPDISCOVER_MEMORY_ERROR)
   else:
-    return strupnperror(errno)
+    return strupnperror(errorNumber)
 
 # trim a Nim string to the length of the internal cstring
 proc trimString(s: var string) =
