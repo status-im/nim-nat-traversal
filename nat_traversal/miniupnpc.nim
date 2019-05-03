@@ -72,9 +72,9 @@ type
 importConst(UPNPCOMMAND_SUCCESS, "upnpcommands.h", cint)
 importConst(UPNPCOMMAND_UNKNOWN_ERROR, "upnpcommands.h", cint)
 importConst(UPNPCOMMAND_INVALID_ARGS, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_HTTP_ERROR, "upnpcommands.h", cint) # not covered by strupnperror()
+importConst(UPNPCOMMAND_HTTP_ERROR, "upnpcommands.h", cint)
 importConst(UPNPCOMMAND_INVALID_RESPONSE, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_MEM_ALLOC_ERROR, "upnpcommands.h", cint) # not covered by strupnperror()
+importConst(UPNPCOMMAND_MEM_ALLOC_ERROR, "upnpcommands.h", cint)
 
 proc UPNP_GetTotalBytesSent*(controlURL: cstring; servicetype: cstring): culonglong {.
     importc: "UPNP_GetTotalBytesSent", header: "upnpcommands.h".}
