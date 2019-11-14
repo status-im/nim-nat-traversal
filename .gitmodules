@@ -5,6 +5,6 @@
 	url = https://github.com/miniupnp/miniupnp.git
 [submodule "vendor/libnatpmp"]
 	path = vendor/libnatpmp
-	url = https://github.com/miniupnp/libnatpmp.git
+	url = https://github.com/status-im/libnatpmp.git
 	ignore = dirty
 	branch = master
