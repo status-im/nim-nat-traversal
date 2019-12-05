@@ -10,7 +10,7 @@
 # headers and library location #
 ################################
 
-import ospaths, ./utils
+import os
 when defined(windows):
   import winlean
 else:
@@ -35,7 +35,7 @@ when defined(windows):
 {.passC: "-DENABLE_STRNATPMPERR".}
 
 ##  NAT-PMP Port as defined by the NAT-PMP draft
-importConst(NATPMP_PORT, "natpmp.h", cint)
+const NATPMP_PORT* = cint(5351)
 
 type
   PublicAddressStruct* {.importc: "struct no_name", header: "natpmp.h", bycopy.} = object
@@ -67,9 +67,10 @@ type
 
 
 ##  possible values for type field of natpmpresp_t
-importConst(NATPMP_RESPTYPE_PUBLICADDRESS, "natpmp.h", cint)
-importConst(NATPMP_RESPTYPE_UDPPORTMAPPING, "natpmp.h", cint)
-importConst(NATPMP_RESPTYPE_TCPPORTMAPPING, "natpmp.h", cint)
+const
+  NATPMP_RESPTYPE_PUBLICADDRESS* = cushort(0)
+  NATPMP_RESPTYPE_UDPPORTMAPPING* = cushort(1)
+  NATPMP_RESPTYPE_TCPPORTMAPPING* = cushort(2)
 
 ##  Values to pass to sendnewportmappingrequest()
 const
@@ -79,40 +80,40 @@ const
 ##  return values
 
 ##  NATPMP_ERR_INVALIDARGS : invalid arguments passed to the function
-importConst(NATPMP_ERR_INVALIDARGS, "natpmp.h", cint)
+const NATPMP_ERR_INVALIDARGS* = cint(-1)
 ##  NATPMP_ERR_SOCKETERROR : socket() failed. check errno for details
-importConst(NATPMP_ERR_SOCKETERROR, "natpmp.h", cint)
+const NATPMP_ERR_SOCKETERROR* = cint(-2)
 ##  NATPMP_ERR_CANNOTGETGATEWAY : can't get default gateway IP
-importConst(NATPMP_ERR_CANNOTGETGATEWAY, "natpmp.h", cint)
+const NATPMP_ERR_CANNOTGETGATEWAY* = cint(-3)
 ##  NATPMP_ERR_CLOSEERR : close() failed. check errno for details
-importConst(NATPMP_ERR_CLOSEERR, "natpmp.h", cint)
+const NATPMP_ERR_CLOSEERR* = cint(-4)
 ##  NATPMP_ERR_RECVFROM : recvfrom() failed. check errno for details
-importConst(NATPMP_ERR_RECVFROM, "natpmp.h", cint)
+const NATPMP_ERR_RECVFROM* = cint(-5)
 ##  NATPMP_ERR_NOPENDINGREQ : readnatpmpresponseorretry() called while no NAT-PMP request was pending
-importConst(NATPMP_ERR_NOPENDINGREQ, "natpmp.h", cint)
+const NATPMP_ERR_NOPENDINGREQ* = cint(-6)
 ##  NATPMP_ERR_NOGATEWAYSUPPORT : the gateway does not support NAT-PMP
-importConst(NATPMP_ERR_NOGATEWAYSUPPORT, "natpmp.h", cint)
+const NATPMP_ERR_NOGATEWAYSUPPORT* = cint(-7)
 ##  NATPMP_ERR_CONNECTERR : connect() failed. check errno for details
-importConst(NATPMP_ERR_CONNECTERR, "natpmp.h", cint)
+const NATPMP_ERR_CONNECTERR* = cint(-8)
 ##  NATPMP_ERR_WRONGPACKETSOURCE : packet not received from the network gateway
-importConst(NATPMP_ERR_WRONGPACKETSOURCE, "natpmp.h", cint)
+const NATPMP_ERR_WRONGPACKETSOURCE* = cint(-9)
 ##  NATPMP_ERR_SENDERR : send() failed. check errno for details
-importConst(NATPMP_ERR_SENDERR, "natpmp.h", cint)
+const NATPMP_ERR_SENDERR* = cint(-10)
 ##  NATPMP_ERR_FCNTLERROR : fcntl() failed. check errno for details
-importConst(NATPMP_ERR_FCNTLERROR, "natpmp.h", cint)
+const NATPMP_ERR_FCNTLERROR* = cint(-11)
 ##  NATPMP_ERR_GETTIMEOFDAYERR : gettimeofday() failed. check errno for details
-importConst(NATPMP_ERR_GETTIMEOFDAYERR, "natpmp.h", cint)
+const NATPMP_ERR_GETTIMEOFDAYERR* = cint(-12)
 
-importConst(NATPMP_ERR_UNSUPPORTEDVERSION, "natpmp.h", cint)
-importConst(NATPMP_ERR_UNSUPPORTEDOPCODE, "natpmp.h", cint)
+const NATPMP_ERR_UNSUPPORTEDVERSION* = cint(-14)
+const NATPMP_ERR_UNSUPPORTEDOPCODE* = cint(-15)
 
 ##  Errors from the server :
-importConst(NATPMP_ERR_UNDEFINEDERROR, "natpmp.h", cint)
-importConst(NATPMP_ERR_NOTAUTHORIZED, "natpmp.h", cint)
-importConst(NATPMP_ERR_NETWORKFAILURE, "natpmp.h", cint)
-importConst(NATPMP_ERR_OUTOFRESOURCES, "natpmp.h", cint)
+const NATPMP_ERR_UNDEFINEDERROR* = cint(-49)
+const NATPMP_ERR_NOTAUTHORIZED* = cint(-51)
+const NATPMP_ERR_NETWORKFAILURE* = cint(-52)
+const NATPMP_ERR_OUTOFRESOURCES* = cint(-53)
 ##  NATPMP_TRYAGAIN : no data available for the moment. try again later
-importConst(NATPMP_TRYAGAIN, "natpmp.h", cint)
+const NATPMP_TRYAGAIN* = cint(-100)
 
 ##  initnatpmp()
 ##  initialize a natpmp_t object
