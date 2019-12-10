@@ -46,7 +46,7 @@ type
     mappedpublicport* {.importc: "mappedpublicport".}: cushort
     lifetime* {.importc: "lifetime".}: culong
 
-  PnuUnion* {.importc: "struct no_name", header: "natpmp.h", bycopy.} = object {.union.}
+  PnuUnion* {.importc: "struct no_name", header: "natpmp.h", bycopy, union.} = object
     publicaddress* {.importc: "publicaddress".}: PublicAddressStruct
     newportmapping* {.importc: "newportmapping".}: NewPortMappingStruct
 
@@ -194,7 +194,7 @@ proc strnatpmperr*(t: cint): cstring {.importc: "strnatpmperr", header: "natpmp.
 # custom wrappers #
 ###################
 
-import result, strutils
+import result
 
 type NatPmp* {.packed.} = ref object
   cstruct*: natpmp_t

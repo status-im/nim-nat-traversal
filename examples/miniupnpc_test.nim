@@ -70,7 +70,6 @@ if false:
     echo "Added port mapping for: ", port
   checkError upnp.getSpecificPortMapping(port, TCP):
     printPortMapping(res.value)
-  var randomPort: string
   checkError upnp.deletePortMapping(port, TCP):
     echo "Deleted port mapping for: ", port
   doAssert(upnp.getSpecificPortMapping(port, TCP).isErr)

@@ -10,12 +10,13 @@
 # headers and library location #
 ################################
 
-import ospaths, ./utils
+import ./utils
 
 when defined(miniupnpcUseSystemLibs):
   {.passC: staticExec("pkg-config --cflags miniupnpc").}
   {.passL: staticExec("pkg-config --libs miniupnpc").}
 else:
+  import os
   const includePath = currentSourcePath.parentDir().parentDir() / "vendor" / "miniupnp" / "miniupnpc"
   {.passC: "-I" & includePath.}
   # We can't use the {.link.} pragma in here, because it would place the static
