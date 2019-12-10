@@ -69,12 +69,13 @@ type
 ##################
 
 ##  MiniUPnPc return codes :
-importConst(UPNPCOMMAND_SUCCESS, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_UNKNOWN_ERROR, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_INVALID_ARGS, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_HTTP_ERROR, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_INVALID_RESPONSE, "upnpcommands.h", cint)
-importConst(UPNPCOMMAND_MEM_ALLOC_ERROR, "upnpcommands.h", cint)
+const
+  UPNPCOMMAND_SUCCESS* = cint(0)
+  UPNPCOMMAND_UNKNOWN_ERROR* = cint(-1)
+  UPNPCOMMAND_INVALID_ARGS* = cint(-2)
+  UPNPCOMMAND_HTTP_ERROR* = cint(-3)
+  UPNPCOMMAND_INVALID_RESPONSE* = cint(-4)
+  UPNPCOMMAND_MEM_ALLOC_ERROR* = cint(-5)
 
 proc UPNP_GetTotalBytesSent*(controlURL: cstring; servicetype: cstring): culonglong {.
     importc: "UPNP_GetTotalBytesSent", header: "upnpcommands.h".}
@@ -353,7 +354,6 @@ proc UPNP_GetPinholePackets*(controlURL: cstring; servicetype: cstring;
 ##  Structure to store the result of the parsing of UPnP
 ##  descriptions of Internet Gateway Devices
 const
-  # can't use importConst() here, because it needs to be available at compile time
   MINIUPNPC_URL_MAXSIZE* = (128)
 
 type
@@ -401,20 +401,22 @@ proc freeUPNPDevlist*(devlist: ptr UPNPDev) {.importc: "freeUPNPDevlist",
 ###############
 
 ##  error codes :
-importConst(UPNPDISCOVER_SUCCESS, "miniupnpc.h", cint)
-importConst(UPNPDISCOVER_UNKNOWN_ERROR, "miniupnpc.h", cint)
-importConst(UPNPDISCOVER_SOCKET_ERROR, "miniupnpc.h", cint)
-importConst(UPNPDISCOVER_MEMORY_ERROR, "miniupnpc.h", cint)
+const UPNPDISCOVER_SUCCESS* = cint(0)
+const UPNPDISCOVER_UNKNOWN_ERROR* = cint(-1)
+const UPNPDISCOVER_SOCKET_ERROR* = cint(-101)
+const UPNPDISCOVER_MEMORY_ERROR* = cint(-102)
 
 ##  versions :
+# We use importConst here because when a system header is used, we want the
+# number from the actual header file.
 importConst(MINIUPNPC_VERSION, "miniupnpc.h", cstring)
 importConst(MINIUPNPC_API_VERSION, "miniupnpc.h", cint)
 
 ##  Source port:
 ##    Using "1" as an alias for 1900 for backwards compatibility
 ##    (presuming one would have used that for the "sameport" parameter)
-importConst(UPNP_LOCAL_PORT_ANY, "miniupnpc.h", cint)
-importConst(UPNP_LOCAL_PORT_SAME, "miniupnpc.h", cint)
+const UPNP_LOCAL_PORT_ANY* = cint(0)
+const UPNP_LOCAL_PORT_SAME* = cint(1)
 
 ##  Structures definitions :
 type
@@ -591,28 +593,28 @@ type SentReceivedResult = Result[culonglong, cstring]
 
 proc totalBytesSent*(self: Miniupnp): SentReceivedResult =
   let res = UPNP_GetTotalBytesSent(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
-  if res == UPNPCOMMAND_HTTP_ERROR.culonglong:
+  if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)
 
 proc totalBytesReceived*(self: Miniupnp): SentReceivedResult =
   let res = UPNP_GetTotalBytesReceived(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
-  if res == UPNPCOMMAND_HTTP_ERROR.culonglong:
+  if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)
 
 proc totalPacketsSent*(self: Miniupnp): SentReceivedResult =
   let res = UPNP_GetTotalPacketsSent(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
-  if res == UPNPCOMMAND_HTTP_ERROR.culonglong:
+  if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)
 
 proc totalPacketsReceived*(self: Miniupnp): SentReceivedResult =
   let res = UPNP_GetTotalPacketsReceived(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
-  if res == UPNPCOMMAND_HTTP_ERROR.culonglong:
+  if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)

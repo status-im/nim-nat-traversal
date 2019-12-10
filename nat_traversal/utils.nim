@@ -27,4 +27,3 @@ macro importConst*(cname: untyped, cheader: string, ctype: untyped): untyped =
       )
     )
   )
-
