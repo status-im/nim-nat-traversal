@@ -675,13 +675,12 @@ proc addPortMapping*(self: Miniupnp,
                       desc = "miniupnpc",
                       leaseDuration = 0,
                       externalIP = ""): Result[bool, cstring] =
-  var extIP = externalIP
-  if extIP == "":
-    let IPRes = self.externalIPAddress()
-    if IPRes.isErr():
-      result.err(IPRes.error)
-      return
-    extIP = IPRes.value
+  var extIP = externalIP.cstring
+  if externalIP == "":
+    # Some IGDs can't handle explicit external IPs here (they fail with "RemoteHostOnlySupportsWildcard").
+    # That's why we default to an empty address, which gets converted into a
+    # NULL pointer for the wrapped library.
+    extIP = nil
   let res = UPNP_AddPortMapping(self.urls.controlURL,
                                 addr(self.data.first.servicetype),
                                 externalPort.cstring,
@@ -689,7 +688,7 @@ proc addPortMapping*(self: Miniupnp,
                                 internalHost.cstring,
                                 desc.cstring,
                                 cstring($protocol),
-                                extIP.cstring,
+                                extIP,
                                 cstring($leaseDuration))
   if res == UPNPCOMMAND_SUCCESS:
     result.ok(true)
@@ -707,13 +706,9 @@ proc addAnyPortMapping*(self: Miniupnp,
                         desc = "miniupnpc",
                         leaseDuration = 0,
                         externalIP = ""): Result[string, cstring] =
-  var extIP = externalIP
-  if extIP == "":
-    let IPRes = self.externalIPAddress()
-    if IPRes.isErr():
-      result.err(IPRes.error)
-      return
-    extIP = IPRes.value
+  var extIP = externalIP.cstring
+  if externalIP == "":
+    extIP = nil
   var reservedPort = newString(6)
   let res = UPNP_AddAnyPortMapping(self.urls.controlURL,
                                 addr(self.data.first.servicetype),
@@ -722,7 +717,7 @@ proc addAnyPortMapping*(self: Miniupnp,
                                 internalHost.cstring,
                                 desc.cstring,
                                 cstring($protocol),
-                                extIP.cstring,
+                                extIP,
                                 cstring($leaseDuration),
                                 reservedPort.cstring)
   if res == UPNPCOMMAND_SUCCESS:
@@ -735,11 +730,14 @@ proc deletePortMapping*(self: Miniupnp,
                         externalPort: string,
                         protocol: UPNPProtocol,
                         remoteHost = ""): Result[bool, cstring] =
+  var remHost = remoteHost.cstring
+  if remoteHost == "":
+    remHost = nil
   let res = UPNP_DeletePortMapping(self.urls.controlURL,
                                     addr(self.data.first.servicetype),
                                     externalPort.cstring,
                                     cstring($protocol),
-                                    remoteHost.cstring)
+                                    remHost)
   if res == UPNPCOMMAND_SUCCESS:
     result.ok(true)
   else:
@@ -796,11 +794,14 @@ proc getSpecificPortMapping*(self: Miniupnp,
   portMapping.internalClient.setLen(40)
   portMapping.internalPort.setLen(6)
   portMapping.description.setLen(80)
+  var remHost = remoteHost.cstring
+  if remoteHost == "":
+    remHost = nil
   let res = UPNP_GetSpecificPortMappingEntry(self.urls.controlURL,
                                               addr(self.data.first.servicetype),
                                               externalPort.cstring,
                                               cstring($protocol),
-                                              remoteHost.cstring,
+                                              remHost,
                                               portMapping.internalClient.cstring,
                                               portMapping.internalPort.cstring,
                                               portMapping.description.cstring,
