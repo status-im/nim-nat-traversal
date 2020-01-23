@@ -8,7 +8,7 @@ license       = "Apache License 2.0 or MIT"
 installDirs   = @["vendor"]
 
 ### Dependencies
-requires "nim >= 0.19.0", "result"
+requires "nim >= 0.19.0", "stew"
 
 proc compileStaticLibraries() =
   withDir "vendor/miniupnp/miniupnpc":

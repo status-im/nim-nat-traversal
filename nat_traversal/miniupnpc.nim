@@ -515,7 +515,7 @@ proc UPNPIGD_IsConnected*(a1: ptr UPNPUrls; a2: ptr IGDdatas): cint {.
 # custom wrappers #
 ###################
 
-import result, strutils
+import stew/result, strutils
 
 type Miniupnp* = ref object
   devList*: ptr UPNPDev
