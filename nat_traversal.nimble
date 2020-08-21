@@ -11,14 +11,17 @@ installDirs   = @["vendor"]
 requires "nim >= 0.19.0", "stew"
 
 proc compileStaticLibraries() =
+  if getEnv("CC", "").len == 0:
+    putEnv("CC", "gcc")
+
   withDir "vendor/miniupnp/miniupnpc":
     when defined(windows):
-      exec("mingw32-make -f Makefile.mingw CC=gcc init libminiupnpc.a")
+      exec("mingw32-make -f Makefile.mingw init libminiupnpc.a")
     else:
       exec("make libminiupnpc.a")
   withDir "vendor/libnatpmp":
     when defined(windows):
-      exec("mingw32-make CC=gcc CFLAGS=\"-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4\" libnatpmp.a")
+      exec("mingw32-make CFLAGS=\"-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4\" libnatpmp.a")
     else:
       exec("make CFLAGS=\"-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4\" libnatpmp.a")
 
