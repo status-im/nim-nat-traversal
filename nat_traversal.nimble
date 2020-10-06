@@ -21,10 +21,10 @@ proc compileStaticLibraries() =
       exec("mingw32-make -f Makefile.mingw init libminiupnpc.a")
     else:
       exec("make libminiupnpc.a")
-  withDir "vendor/libnatpmp":
+  withDir "vendor/libnatpmp-upstream":
     when defined(windows):
       # We really need to override CC on the Make command line, here, because of:
-      # https://github.com/status-im/libnatpmp/blob/976d2c3b5e7022e7292f0170d0dba7ed492da216/Makefile#L51
+      # https://github.com/miniupnp/libnatpmp/blob/4536032ae32268a45c073a4d5e91bbab4534773a/Makefile#L51
       exec("mingw32-make CC=\"" & cc & "\" CFLAGS=\"-Wall -Os -DWIN32 -DNATPMP_STATICLIB -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4\" libnatpmp.a")
     else:
       exec("make CFLAGS=\"-Wall -Os -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4\" libnatpmp.a")

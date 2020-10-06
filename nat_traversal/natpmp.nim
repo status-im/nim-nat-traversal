@@ -19,7 +19,7 @@ else:
 when defined(libnatpmpUseSystemLibs):
   {.passL: "-lnatpmp".}
 else:
-  const includePath = currentSourcePath.parentDir().parentDir() / "vendor" / "libnatpmp"
+  const includePath = currentSourcePath.parentDir().parentDir() / "vendor" / "libnatpmp-upstream"
   {.passC: "-I" & includePath.}
   {.passL: includePath / "libnatpmp.a".}
 
