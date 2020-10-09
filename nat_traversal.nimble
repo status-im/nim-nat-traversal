@@ -18,7 +18,7 @@ proc compileStaticLibraries() =
 
   withDir "vendor/miniupnp/miniupnpc":
     when defined(windows):
-      exec("mingw32-make -f Makefile.mingw init libminiupnpc.a")
+      exec("mingw32-make -f Makefile.mingw libminiupnpc.a")
     else:
       exec("make libminiupnpc.a")
   withDir "vendor/libnatpmp-upstream":
