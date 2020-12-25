@@ -10,6 +10,8 @@
 # headers and library location #
 ################################
 
+{.push raises: [Defect].}
+
 import ./utils
 
 when defined(miniupnpcUseSystemLibs):
@@ -515,7 +517,8 @@ proc UPNPIGD_IsConnected*(a1: ptr UPNPUrls; a2: ptr IGDdatas): cint {.
 # custom wrappers #
 ###################
 
-import stew/result, strutils
+import stew/results, std/strutils
+export results
 
 type Miniupnp* = ref object
   devList*: ptr UPNPDev
@@ -530,13 +533,14 @@ type Miniupnp* = ref object
   error*: cint
   lanAddr*: string
 
-proc miniupnpFinalizer(x: Miniupnp) =
-  freeUPNPDevlist(x.devList)
-  x.devList = nil
-  freeUPNPUrls(addr(x.urls))
+proc close*(x: Miniupnp) =
+  if x.devList != nil:
+    freeUPNPDevlist(x.devList)
+    x.devList = nil
+    freeUPNPUrls(addr(x.urls))
 
 proc newMiniupnp*(): Miniupnp =
-  new(result, miniupnpFinalizer)
+  new(result)
   result.ttl = 2.cuchar
 
 proc `=deepCopy`*(x: Miniupnp): Miniupnp =
@@ -812,9 +816,16 @@ proc getSpecificPortMapping*(self: Miniupnp,
     trimString(portMapping.internalPort)
     trimString(portMapping.description)
     trimString(enabledStr)
-    portMapping.enabled = bool(parseInt(enabledStr))
+    portMapping.enabled = try:
+        bool(parseInt(enabledStr))
+      except ValueError: # shouldn't happen..
+        false
     trimString(leaseDurationStr)
-    portMapping.leaseDuration = parseBiggestUInt(leaseDurationStr)
+    portMapping.leaseDuration =
+      try:
+        parseBiggestUInt(leaseDurationStr)
+      except ValueError:
+        return err("upnp: cannot parsse lease duration")
     result.ok(portMapping)
   else:
     result.err(upnpError(res))
@@ -848,13 +859,25 @@ proc getGenericPortMapping*(self: Miniupnp,
     trimString(portMapping.internalClient)
     trimString(portMapping.internalPort)
     trimString(protocolStr)
-    portMapping.protocol = parseEnum[UPNPProtocol](protocolStr)
+    portMapping.protocol =
+      try:
+        parseEnum[UPNPProtocol](protocolStr)
+      except ValueError:
+        return err("upnp: cannot parse upnp protocol")
     trimString(portMapping.description)
     trimString(enabledStr)
-    portMapping.enabled = bool(parseInt(enabledStr))
+    portMapping.enabled =
+      try:
+        bool(parseInt(enabledStr))
+      except ValueError:
+        false
     trimString(portMapping.remoteHost)
     trimString(leaseDurationStr)
-    portMapping.leaseDuration = parseBiggestUInt(leaseDurationStr)
+    portMapping.leaseDuration =
+      try:
+        parseBiggestUInt(leaseDurationStr)
+      except ValueError:
+        return err("upnp: cannot parse duration")
     result.ok(portMapping)
   else:
     result.err(upnpError(res))

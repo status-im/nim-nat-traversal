@@ -10,6 +10,8 @@
 # headers and library location #
 ################################
 
+{.push raises: [Defect].}
+
 import os
 when defined(windows):
   import winlean
@@ -194,16 +196,18 @@ proc strnatpmperr*(t: cint): cstring {.importc: "strnatpmperr", header: "natpmp.
 # custom wrappers #
 ###################
 
-import stew/results
+import
+  stew/results
+export results
 
 type NatPmp* {.packed.} = ref object
   cstruct*: natpmp_t
 
-proc natpmpFinalizer(x: NatPmp) =
+proc close*(x: NatPmp) =
   discard closenatpmp(addr(x.cstruct))
 
 proc newNatPmp*(): NatPmp =
-  new(result, natpmpFinalizer)
+  new(result)
 
 proc init*(self: NatPmp): Result[bool, cstring] =
   let res = initnatpmp(addr(self.cstruct), 0, 0)
