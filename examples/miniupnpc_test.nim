@@ -8,7 +8,7 @@
 
 # This is the equivalent of miniupnpc/pymoduletest.py (without the command line args).
 
-import nat_traversal/miniupnpc, result, strformat
+import nat_traversal/miniupnpc, strformat
 
 template checkError(expr, body: untyped): untyped =
   block:
