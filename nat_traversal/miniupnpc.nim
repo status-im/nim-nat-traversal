@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Status Research & Development GmbH
+# Copyright (c) 2019-2022 Status Research & Development GmbH
 # Licensed under either of
 #  * Apache License, version 2.0, ([LICENSE-APACHE](LICENSE-APACHE))
 #  * MIT license ([LICENSE-MIT](LICENSE-MIT))
@@ -12,19 +12,20 @@
 
 {.push raises: [Defect].}
 
-import ./utils
+import std/strutils,
+      ./utils
 
 when defined(miniupnpcUseSystemLibs):
   {.passC: staticExec("pkg-config --cflags miniupnpc").}
   {.passL: staticExec("pkg-config --libs miniupnpc").}
 else:
   import os
-  const includePath = currentSourcePath.parentDir().parentDir() / "vendor" / "miniupnp" / "miniupnpc"
+  const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/miniupnp/miniupnpc"
   {.passC: "-I" & includePath.}
   # We can't use the {.link.} pragma in here, because it would place the static
   # library archive as the first object to be linked, which would lead to all
   # its exported symbols being ignored. We move it into the last position with {.passL.}.
-  {.passL: includePath / "libminiupnpc.a".}
+  {.passL: includePath & "/libminiupnpc.a".}
 
 when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
@@ -517,7 +518,7 @@ proc UPNPIGD_IsConnected*(a1: ptr UPNPUrls; a2: ptr IGDdatas): cint {.
 # custom wrappers #
 ###################
 
-import stew/results, std/strutils
+import stew/results
 export results
 
 type Miniupnp* = ref object

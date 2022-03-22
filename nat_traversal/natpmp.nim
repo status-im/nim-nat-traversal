@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Status Research & Development GmbH
+# Copyright (c) 2019-2022 Status Research & Development GmbH
 # Licensed under either of
 #  * Apache License, version 2.0, ([LICENSE-APACHE](LICENSE-APACHE))
 #  * MIT license ([LICENSE-MIT](LICENSE-MIT))
@@ -12,7 +12,7 @@
 
 {.push raises: [Defect].}
 
-import os
+import os, strutils
 when defined(windows):
   import winlean
 else:
@@ -21,9 +21,9 @@ else:
 when defined(libnatpmpUseSystemLibs):
   {.passL: "-lnatpmp".}
 else:
-  const includePath = currentSourcePath.parentDir().parentDir() / "vendor" / "libnatpmp-upstream"
+  const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/libnatpmp-upstream"
   {.passC: "-I" & includePath.}
-  {.passL: includePath / "libnatpmp.a".}
+  {.passL: includePath & "/libnatpmp.a".}
 
 when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
