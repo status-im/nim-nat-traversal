@@ -11,3 +11,5 @@ nimcache/
 /examples/miniupnpc_test
 /examples/natpmp_test
 
+nimble.develop
+nimble.paths
