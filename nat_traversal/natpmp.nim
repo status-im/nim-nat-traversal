@@ -19,22 +19,22 @@ else:
   import posix
 
 when defined(libnatpmpUseSystemLibs):
-  {.passL: "-lnatpmp".}
+  {.passl: "-lnatpmp".}
 else:
   const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/libnatpmp-upstream"
-  {.passC: "-I" & includePath.}
-  {.passL: includePath & "/libnatpmp.a".}
+  {.passc: "-I" & includePath.}
+  {.passl: includePath & "/libnatpmp.a".}
 
 when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
-  {.passC: "-DNATPMP_STATICLIB".}
-  {.passL: "-lws2_32 -liphlpapi".}
+  {.passc: "-DNATPMP_STATICLIB".}
+  {.passl: "-lws2_32 -liphlpapi".}
 
 ############
 # natpmp.h #
 ############
 
-{.passC: "-DENABLE_STRNATPMPERR".}
+{.passc: "-DENABLE_STRNATPMPERR".}
 
 ##  NAT-PMP Port as defined by the NAT-PMP draft
 const NATPMP_PORT* = cint(5351)
