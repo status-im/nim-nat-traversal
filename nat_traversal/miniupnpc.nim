@@ -16,21 +16,21 @@ import std/strutils,
       ./utils
 
 when defined(miniupnpcUseSystemLibs):
-  {.passC: staticExec("pkg-config --cflags miniupnpc").}
-  {.passL: staticExec("pkg-config --libs miniupnpc").}
+  {.passc: staticExec("pkg-config --cflags miniupnpc").}
+  {.passl: staticExec("pkg-config --libs miniupnpc").}
 else:
   import os
   const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/miniupnp/miniupnpc"
-  {.passC: "-I" & includePath.}
+  {.passc: "-I" & includePath.}
   # We can't use the {.link.} pragma in here, because it would place the static
   # library archive as the first object to be linked, which would lead to all
   # its exported symbols being ignored. We move it into the last position with {.passL.}.
-  {.passL: includePath & "/libminiupnpc.a".}
+  {.passl: includePath & "/libminiupnpc.a".}
 
 when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
-  {.passC: "-DMINIUPNP_STATICLIB".}
-  {.passL: "-lws2_32 -liphlpapi".}
+  {.passc: "-DMINIUPNP_STATICLIB".}
+  {.passl: "-lws2_32 -liphlpapi".}
 
 ################
 # upnperrors.h #

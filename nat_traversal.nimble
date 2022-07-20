@@ -8,7 +8,8 @@ license       = "Apache License 2.0 or MIT"
 installDirs   = @["vendor"]
 
 ### Dependencies
-requires "nim >= 0.19.0", "stew"
+requires "nim >= 1.2.0",
+         "stew"
 
 proc compileStaticLibraries() =
   var cc = getEnv("CC", "")
@@ -34,4 +35,3 @@ task buildBundledLibs, "build bundled libraries":
 
 before install:
   compileStaticLibraries()
-
