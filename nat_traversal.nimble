@@ -21,7 +21,7 @@ proc compileStaticLibraries() =
     when defined(windows):
       exec("mingw32-make -f Makefile.mingw libminiupnpc.a")
     else:
-      exec("make libminiupnpc.a")
+      exec("make build/libminiupnpc.a")
   withDir "vendor/libnatpmp-upstream":
     when defined(windows):
       # We really need to override CC on the Make command line, here, because of:

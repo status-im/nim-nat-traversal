@@ -20,12 +20,20 @@ when defined(miniupnpcUseSystemLibs):
   {.passl: staticExec("pkg-config --libs miniupnpc").}
 else:
   import os
-  const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/miniupnp/miniupnpc"
-  {.passc: "-I" & includePath.}
+  const
+    rootPath = currentSourcePath.parentDir().parentDir().replace('\\', '/')
+    miniupnpcPath = rootPath & "/vendor/miniupnp/miniupnpc"
+    includeFlag = "-I" & miniupnpcPath & "/include"
+    # The Makefiles of the miniupnp library have an inconsistency
+    # where the output path is different on Windows:
+    buildOutputDir = when defined(windows): ""
+                      else: "/build"
+    libraryPath = miniupnpcPath & buildOutputDir & "/libminiupnpc.a"
+  {.passc: includeFlag.}
   # We can't use the {.link.} pragma in here, because it would place the static
   # library archive as the first object to be linked, which would lead to all
   # its exported symbols being ignored. We move it into the last position with {.passL.}.
-  {.passl: includePath & "/libminiupnpc.a".}
+  {.passl: libraryPath.}
 
 when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
