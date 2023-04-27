@@ -2,7 +2,7 @@
 	ignore = dirty
 	branch = master
 	path = vendor/miniupnp
-	url = https://github.com/miniupnp/miniupnp.git
+	url = https://github.com/status-im/miniupnp.git
 [submodule "vendor/libnatpmp-upstream"]
 	path = vendor/libnatpmp-upstream
 	url = https://github.com/miniupnp/libnatpmp.git
