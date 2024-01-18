@@ -1,6 +1,6 @@
 [submodule "vendor/miniupnp"]
 	ignore = dirty
-	branch = master
+	branch = status
 	path = vendor/miniupnp
 	url = https://github.com/status-im/miniupnp.git
 [submodule "vendor/libnatpmp-upstream"]
