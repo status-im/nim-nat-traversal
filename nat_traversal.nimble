@@ -8,7 +8,7 @@ license       = "Apache License 2.0 or MIT"
 installDirs   = @["vendor"]
 
 ### Dependencies
-requires "nim >= 1.2.0",
+requires "nim >= 1.6.0",
          "stew"
 
 proc compileStaticLibraries() =
