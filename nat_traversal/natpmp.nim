@@ -29,6 +29,14 @@ when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
   {.passc: "-DNATPMP_STATICLIB".}
   {.passl: "-lws2_32 -liphlpapi".}
+  when not(defined(cpp)):
+    type
+      WinTimeval* {.importc: "struct timeval", header: "<time.h>".} = object
+        tv_sec*, tv_usec*: int32
+
+    proc select*(nfds: cint, readfds, writefds, exceptfds: ptr TFdSet,
+                 timeout: ptr WinTimeval): cint {.
+      stdcall, importc: "select", dynlib: "ws2_32.dll".}
 
 ############
 # natpmp.h #
@@ -169,7 +177,7 @@ proc sendnewportmappingrequest*(p: ptr natpmp_t; protocol: cint;
 ##  NATPMP_ERR_INVALIDARGS
 ##  NATPMP_ERR_GETTIMEOFDAYERR
 ##  NATPMP_ERR_NOPENDINGREQ
-proc getnatpmprequesttimeout*(p: ptr natpmp_t; timeout: ptr Timeval): cint {.importc: "getnatpmprequesttimeout", header: "natpmp.h".}
+proc getnatpmprequesttimeout*(p: ptr natpmp_t; timeout: ptr WinTimeval): cint {.importc: "getnatpmprequesttimeout", header: "natpmp.h".}
 
 ##  readnatpmpresponseorretry()
 ##  fills the natpmpresp_t structure if possible
@@ -222,7 +230,7 @@ proc `=deepCopy`(x: NatPmp): NatPmp =
 proc getNatPmpResponse(self: NatPmp, natPmpResponsePtr: ptr natpmpresp_t): Result[bool, string] =
   var
     res: cint
-    timeout: Timeval
+    timeout: WinTimeval
     fds: TFdSet
 
   while true:
