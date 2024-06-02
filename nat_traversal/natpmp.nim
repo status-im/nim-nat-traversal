@@ -29,14 +29,13 @@ when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
   {.passc: "-DNATPMP_STATICLIB".}
   {.passl: "-lws2_32 -liphlpapi".}
-  when not(defined(cpp)):
-    type
-      WinTimeval* {.importc: "struct timeval", header: "<time.h>".} = object
-        tv_sec*, tv_usec*: int32
+  type
+    WinTimeval* {.importc: "struct timeval", header: "<time.h>".} = object
+      tv_sec*, tv_usec*: int32
 
-    proc select*(nfds: cint, readfds, writefds, exceptfds: ptr TFdSet,
-                 timeout: ptr WinTimeval): cint {.
-      stdcall, importc: "select", dynlib: "ws2_32.dll".}
+  proc select*(nfds: cint, readfds, writefds, exceptfds: ptr TFdSet,
+               timeout: ptr WinTimeval): cint {.
+    stdcall, importc: "select", dynlib: "ws2_32.dll".}
 
 ############
 # natpmp.h #
