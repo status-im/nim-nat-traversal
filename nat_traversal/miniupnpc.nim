@@ -503,7 +503,8 @@ type
 ##  free allocated memory.
 ##
 proc UPNP_GetValidIGD*(devlist: ptr UPNPDev; urls: ptr UPNPUrls; data: ptr IGDdatas;
-                      lanaddr: cstring; lanaddrlen: cint): cint {.
+                      lanaddr: cstring; lanaddrlen: cint;
+                      wanaddr: cstring; wanaddrlen: cint): cint {.
     importc: "UPNP_GetValidIGD", header: "miniupnpc.h".}
 
 ##  UPNP_GetIGDFromUrl()
@@ -541,6 +542,7 @@ type Miniupnp* = ref object
   ttl*: cuchar
   error*: cint
   lanAddr*: string
+  wanAddr*: string
 
 proc close*(x: Miniupnp) =
   if x.devList != nil:
@@ -594,14 +596,18 @@ type SelectIGDResult* = enum
   NotAnIGD = 3
 
 proc selectIGD*(self: Miniupnp): SelectIGDResult =
-  let lanaddrlen = 40.cint
+  let addrLen = 40.cint
   self.lanAddr.setLen(40)
+  self.wanAddr.setLen(40)
   result = UPNP_GetValidIGD(self.devList,
                             addr(self.urls),
                             addr(self.data),
                             self.lanAddr.cstring,
-                            lanaddrlen).SelectIGDResult
+                            addrLen,
+                            self.wanAddr.cstring,
+                            addrLen).SelectIGDResult
   trimString(self.lanAddr)
+  trimString(self.wanAddr)
 
 type SentReceivedResult = Result[culonglong, cstring]
 
