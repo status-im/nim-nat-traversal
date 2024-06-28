@@ -9,7 +9,7 @@ installDirs   = @["vendor"]
 
 ### Dependencies
 requires "nim >= 1.6.0",
-         "stew"
+         "results"
 
 proc compileStaticLibraries() =
   var cc = getEnv("CC", "")
