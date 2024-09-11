@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 Status Research & Development GmbH
+# Copyright (c) 2019-2024 Status Research & Development GmbH
 # Licensed under either of
 #  * Apache License, version 2.0, ([LICENSE-APACHE](LICENSE-APACHE))
 #  * MIT license ([LICENSE-MIT](LICENSE-MIT))
@@ -492,18 +492,22 @@ type
 
 ##  UPNP_GetValidIGD() :
 ##  return values :
+##     -1 = Internal error
 ##      0 = NO IGD found
 ##      1 = A valid connected IGD has been found
-##      2 = A valid IGD has been found but it reported as
+##      2 = A valid connected IGD has been found but its
+##          IP address is reserved (non routable)
+##      3 = A valid IGD has been found but it reported as
 ##          not connected
-##      3 = an UPnP device has been found but was not recognized as an IGD
+##      4 = an UPnP device has been found but was not recognized as an IGD
 ##
 ##  In any non-zero return case, the urls and data structures
 ##  passed as parameters are set. Don't forget to call freeUPNPUrls(urls) to
 ##  free allocated memory.
 ##
 proc UPNP_GetValidIGD*(devlist: ptr UPNPDev; urls: ptr UPNPUrls; data: ptr IGDdatas;
-                      lanaddr: cstring; lanaddrlen: cint): cint {.
+                      lanaddr: cstring; lanaddrlen: cint;
+                      wanaddr: cstring; wanaddrlen: cint): cint {.
     importc: "UPNP_GetValidIGD", header: "miniupnpc.h".}
 
 ##  UPNP_GetIGDFromUrl()
@@ -526,7 +530,7 @@ proc UPNPIGD_IsConnected*(a1: ptr UPNPUrls; a2: ptr IGDdatas): cint {.
 # custom wrappers #
 ###################
 
-import stew/results
+import results
 export results
 
 type Miniupnp* = ref object
@@ -541,6 +545,7 @@ type Miniupnp* = ref object
   ttl*: cuchar
   error*: cint
   lanAddr*: string
+  wanAddr*: string
 
 proc close*(x: Miniupnp) =
   if x.devList != nil:
@@ -590,18 +595,23 @@ proc discover*(self: Miniupnp): Result[int, cstring] =
 type SelectIGDResult* = enum
   IGDNotFound = 0
   IGDFound = 1
-  IGDNotConnected = 2
-  NotAnIGD = 3
+  IGDIpNotRoutable = 2
+  IGDNotConnected = 3
+  NotAnIGD = 4
 
 proc selectIGD*(self: Miniupnp): SelectIGDResult =
-  let lanaddrlen = 40.cint
+  let addrLen = 40.cint
   self.lanAddr.setLen(40)
-  result = UPNP_GetValidIGD(self.devList,
-                            addr(self.urls),
-                            addr(self.data),
-                            self.lanAddr.cstring,
-                            lanaddrlen).SelectIGDResult
+  self.wanAddr.setLen(40)
+  let res = UPNP_GetValidIGD(
+    self.devList, addr(self.urls), addr(self.data), self.lanAddr.cstring,
+    addrLen, self.wanAddr.cstring, addrLen)
   trimString(self.lanAddr)
+  trimString(self.wanAddr)
+  if res >= low(SelectIGDResult).int and res <= high(SelectIGDResult).int:
+    res.SelectIGDResult
+  else:
+    IGDNotFound  # treat internal error as not found
 
 type SentReceivedResult = Result[culonglong, cstring]
 
@@ -890,4 +900,3 @@ proc getGenericPortMapping*(self: Miniupnp,
     result.ok(portMapping)
   else:
     result.err(upnpError(res))
-

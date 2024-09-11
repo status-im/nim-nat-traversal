@@ -206,8 +206,7 @@ proc strnatpmperr*(t: cint): cstring {.importc: "strnatpmperr", header: "natpmp.
 # custom wrappers #
 ###################
 
-import
-  stew/results
+import results
 export results
 
 type NatPmp* {.packed.} = ref object
