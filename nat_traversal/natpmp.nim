@@ -63,7 +63,7 @@ type
     s* {.importc: "s".}: cint    ##  socket
     gateway* {.importc: "gateway".}: culong ##  default gateway (IPv4)
     has_pending_request* {.importc: "has_pending_request".}: cint
-    pending_request* {.importc: "pending_request".}: array[12, cuchar]
+    pending_request* {.importc: "pending_request".}: array[12, uint8]
     pending_request_len* {.importc: "pending_request_len".}: cint
     try_number* {.importc: "try_number".}: cint
     retry_time* {.importc: "retry_time".}: Timeval
@@ -298,4 +298,3 @@ proc addPortMapping*(self: NatPmp, eport: cushort, iport: cushort, protocol: Nat
 
 proc deletePortMapping*(self: NatPmp, eport: cushort, iport: cushort, protocol: NatPmpProtocol): Result[cushort, string] =
   return self.doMapping(eport, iport, protocol, 0)
-
