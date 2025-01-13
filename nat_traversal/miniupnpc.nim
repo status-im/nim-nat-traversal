@@ -69,7 +69,7 @@ type
     internalClient* {.importc: "internalClient".}: array[64, char]
     description* {.importc: "description".}: array[64, char]
     protocol* {.importc: "protocol".}: array[4, char]
-    enabled* {.importc: "enabled".}: cuchar
+    enabled* {.importc: "enabled".}: uint8
 
   PortMappingParserData* {.importc: "struct PortMappingParserData",
                           header: "portlistingparse.h", bycopy.} = object
@@ -436,9 +436,18 @@ type
     elt* {.importc: "elt".}: cstring
     val* {.importc: "val".}: cstring
 
-proc simpleUPnPcommand*(a1: cint; a2: cstring; a3: cstring; a4: cstring; a5: ptr UPNParg;
-                       a6: ptr cint): cstring {.importc: "simpleUPnPcommand",
-    header: "miniupnpc.h".}
+##  simpleUPnPcommand :
+##  not so simple !
+##  return values :
+##    pointer - OK
+##    NULL - error
+proc simpleUPnPcommand*(
+    url: cstring,
+    service: cstring,
+    action: cstring,
+    args: ptr UPNParg,
+    bufsize: ptr cint
+): cstring {.importc: "simpleUPnPcommand", header: "miniupnpc.h".}
 
 ##  upnpDiscover()
 ##  discover UPnP devices on the network.
@@ -459,21 +468,21 @@ proc simpleUPnPcommand*(a1: cint; a2: cstring; a3: cstring; a4: cstring; a5: ptr
 ##  if 0, the discovery will stop with the first type returning results.
 ##  TTL should default to 2.
 proc upnpDiscover*(delay: cint; multicastif: cstring; minissdpdsock: cstring;
-                  localport: cint; ipv6: cint; ttl: cuchar; error: ptr cint): ptr UPNPDev {.
+                  localport: cint; ipv6: cint; ttl: uint8; error: ptr cint): ptr UPNPDev {.
     importc: "upnpDiscover", header: "miniupnpc.h".}
 
 proc upnpDiscoverAll*(delay: cint; multicastif: cstring; minissdpdsock: cstring;
-                     localport: cint; ipv6: cint; ttl: cuchar; error: ptr cint): ptr UPNPDev {.
+                     localport: cint; ipv6: cint; ttl: uint8; error: ptr cint): ptr UPNPDev {.
     importc: "upnpDiscoverAll", header: "miniupnpc.h".}
 
 proc upnpDiscoverDevice*(device: cstring; delay: cint; multicastif: cstring;
                         minissdpdsock: cstring; localport: cint; ipv6: cint;
-                        ttl: cuchar; error: ptr cint): ptr UPNPDev {.
+                        ttl: uint8; error: ptr cint): ptr UPNPDev {.
     importc: "upnpDiscoverDevice", header: "miniupnpc.h".}
 
 proc upnpDiscoverDevices*(deviceTypes: ptr cstring; delay: cint; multicastif: cstring;
                          minissdpdsock: cstring; localport: cint; ipv6: cint;
-                         ttl: cuchar; error: ptr cint; searchalltypes: cint): ptr UPNPDev {.
+                         ttl: uint8; error: ptr cint; searchalltypes: cint): ptr UPNPDev {.
     importc: "upnpDiscoverDevices", header: "miniupnpc.h".}
 
 ##  structure used to get fast access to urls
@@ -490,21 +499,28 @@ type
     controlURL_6FC* {.importc: "controlURL_6FC".}: cstring
     rootdescURL* {.importc: "rootdescURL".}: cstring
 
+const
+  UPNP_NO_IGD* = cint(0)
+  UPNP_CONNECTED_IGD* = cint(1)
+  UPNP_PRIVATEIP_IGD* = cint(2)
+  UPNP_DISCONNECTED_IGD* = cint(3)
+  UPNP_UNKNOWN_DEVICE* = cint(4)
+
 ##  UPNP_GetValidIGD() :
 ##  return values :
 ##     -1 = Internal error
-##      0 = NO IGD found
-##      1 = A valid connected IGD has been found
+##      0 = NO IGD found (UPNP_NO_IGD)
+##      1 = A valid connected IGD has been found (UPNP_CONNECTED_IGD)
 ##      2 = A valid connected IGD has been found but its
-##          IP address is reserved (non routable)
+##          IP address is reserved (non routable) (UPNP_PRIVATEIP_IGD)
 ##      3 = A valid IGD has been found but it reported as
-##          not connected
+##          not connected (UPNP_DISCONNECTED_IGD)
 ##      4 = an UPnP device has been found but was not recognized as an IGD
+##          (UPNP_UNKNOWN_DEVICE)
 ##
-##  In any non-zero return case, the urls and data structures
-##  passed as parameters are set. Don't forget to call freeUPNPUrls(urls) to
+##  In any positive non zero return case, the urls and data structures
+##  passed as parameters are set. Don't forget to call FreeUPNPUrls(urls) to
 ##  free allocated memory.
-##
 proc UPNP_GetValidIGD*(devlist: ptr UPNPDev; urls: ptr UPNPUrls; data: ptr IGDdatas;
                       lanaddr: cstring; lanaddrlen: cint;
                       wanaddr: cstring; wanaddrlen: cint): cint {.
@@ -542,7 +558,7 @@ type Miniupnp* = ref object
   miniSsdpdSocket*: string
   localPort*: cint
   ipv6*: cint
-  ttl*: cuchar
+  ttl*: uint8
   error*: cint
   lanAddr*: string
   wanAddr*: string
@@ -554,8 +570,9 @@ proc close*(x: Miniupnp) =
     freeUPNPUrls(addr(x.urls))
 
 proc newMiniupnp*(): Miniupnp =
+  doAssert MINIUPNPC_API_VERSION == 19
   new(result)
-  result.ttl = 2.cuchar
+  result.ttl = 2.uint8
 
 proc `=deepCopy`*(x: Miniupnp): Miniupnp =
   doAssert(false, "not implemented")
@@ -593,11 +610,11 @@ proc discover*(self: Miniupnp): Result[int, cstring] =
     result.err(upnpError(self.error))
 
 type SelectIGDResult* = enum
-  IGDNotFound = 0
-  IGDFound = 1
-  IGDIpNotRoutable = 2
-  IGDNotConnected = 3
-  NotAnIGD = 4
+  IGDNotFound = UPNP_NO_IGD.int
+  IGDFound = UPNP_CONNECTED_IGD.int
+  IGDIpNotRoutable = UPNP_PRIVATEIP_IGD.int
+  IGDNotConnected = UPNP_DISCONNECTED_IGD.int
+  NotAnIGD = UPNP_UNKNOWN_DEVICE.int
 
 proc selectIGD*(self: Miniupnp): SelectIGDResult =
   let addrLen = 40.cint
