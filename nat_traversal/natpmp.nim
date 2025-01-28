@@ -22,7 +22,7 @@ when defined(libnatpmpUseSystemLibs):
   {.passl: "-lnatpmp".}
 else:
   const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/libnatpmp-upstream"
-  {.passc: "-I" & includePath.}
+  {.passc: "-iquote " & includePath.}
   {.passl: includePath & "/libnatpmp.a".}
 
 when defined(windows):
