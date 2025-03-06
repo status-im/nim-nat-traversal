@@ -905,7 +905,7 @@ proc close*(x: Miniupnp) =
     freeUPNPUrls(addr(x.urls))
 
 proc newMiniupnp*(): Miniupnp =
-  doAssert MINIUPNPC_API_VERSION == 19
+  doAssert MINIUPNPC_API_VERSION == 20
   new(result)
   result.ttl = 2.uint8
 
