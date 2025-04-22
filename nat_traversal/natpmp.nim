@@ -22,13 +22,20 @@ when defined(libnatpmpUseSystemLibs):
   {.passl: "-lnatpmp".}
 else:
   const includePath = currentSourcePath.parentDir().parentDir().replace('\\', '/') & "/vendor/libnatpmp-upstream"
-  {.passc: "-I" & includePath.}
+  {.passc: "-iquote " & includePath.}
   {.passl: includePath & "/libnatpmp.a".}
 
 when defined(windows):
   import nativesockets # for that wsaStartup() call at the end
   {.passc: "-DNATPMP_STATICLIB".}
   {.passl: "-lws2_32 -liphlpapi".}
+  type
+    WinTimeval* {.importc: "struct timeval", header: "<time.h>".} = object
+      tv_sec*, tv_usec*: int32
+
+  proc select*(nfds: cint, readfds, writefds, exceptfds: ptr TFdSet,
+               timeout: ptr WinTimeval): cint {.
+    stdcall, importc: "select", dynlib: "ws2_32.dll".}
 
 ############
 # natpmp.h #
@@ -56,7 +63,7 @@ type
     s* {.importc: "s".}: cint    ##  socket
     gateway* {.importc: "gateway".}: culong ##  default gateway (IPv4)
     has_pending_request* {.importc: "has_pending_request".}: cint
-    pending_request* {.importc: "pending_request".}: array[12, cuchar]
+    pending_request* {.importc: "pending_request".}: array[12, uint8]
     pending_request_len* {.importc: "pending_request_len".}: cint
     try_number* {.importc: "try_number".}: cint
     retry_time* {.importc: "retry_time".}: Timeval
@@ -169,7 +176,10 @@ proc sendnewportmappingrequest*(p: ptr natpmp_t; protocol: cint;
 ##  NATPMP_ERR_INVALIDARGS
 ##  NATPMP_ERR_GETTIMEOFDAYERR
 ##  NATPMP_ERR_NOPENDINGREQ
-proc getnatpmprequesttimeout*(p: ptr natpmp_t; timeout: ptr Timeval): cint {.importc: "getnatpmprequesttimeout", header: "natpmp.h".}
+when defined(windows):
+  proc getnatpmprequesttimeout*(p: ptr natpmp_t; timeout: ptr WinTimeval): cint {.importc: "getnatpmprequesttimeout", header: "natpmp.h".}
+else:
+  proc getnatpmprequesttimeout*(p: ptr natpmp_t; timeout: ptr Timeval): cint {.importc: "getnatpmprequesttimeout", header: "natpmp.h".}
 
 ##  readnatpmpresponseorretry()
 ##  fills the natpmpresp_t structure if possible
@@ -196,8 +206,7 @@ proc strnatpmperr*(t: cint): cstring {.importc: "strnatpmperr", header: "natpmp.
 # custom wrappers #
 ###################
 
-import
-  stew/results
+import results
 export results
 
 type NatPmp* {.packed.} = ref object
@@ -222,8 +231,12 @@ proc `=deepCopy`(x: NatPmp): NatPmp =
 proc getNatPmpResponse(self: NatPmp, natPmpResponsePtr: ptr natpmpresp_t): Result[bool, string] =
   var
     res: cint
-    timeout: Timeval
     fds: TFdSet
+
+  when defined(windows):
+    var timeout: WinTimeval
+  else:
+    var timeout: Timeval
 
   while true:
     FD_ZERO(fds);
@@ -285,4 +298,3 @@ proc addPortMapping*(self: NatPmp, eport: cushort, iport: cushort, protocol: Nat
 
 proc deletePortMapping*(self: NatPmp, eport: cushort, iport: cushort, protocol: NatPmpProtocol): Result[cushort, string] =
   return self.doMapping(eport, iport, protocol, 0)
-

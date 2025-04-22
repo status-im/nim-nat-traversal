@@ -8,8 +8,8 @@ license       = "Apache License 2.0 or MIT"
 installDirs   = @["vendor"]
 
 ### Dependencies
-requires "nim >= 1.2.0",
-         "stew"
+requires "nim >= 1.6.0",
+         "results"
 
 proc compileStaticLibraries() =
   var cc = getEnv("CC", "")

@@ -1,15 +1,16 @@
 {
-  "version": 1,
+  "version": 2,
   "packages": {
-    "stew": {
-      "version": "0.1.0",
-      "vcsRevision": "6ad35b876fb6ebe0dfee0f697af173acc47906ee",
-      "url": "https://github.com/status-im/nim-stew.git",
+    "results": {
+      "version": "0.4.0",
+      "vcsRevision": "193d3c6648bd0f7e834d4ebd6a1e1d5f93998197",
+      "url": "https://github.com/arnetheduck/nim-results",
       "downloadMethod": "git",
       "dependencies": [],
       "checksums": {
-        "sha1": "46d58c4feb457f3241e3347778334e325dce5268"
+        "sha1": "1e0b1f8bea61c3fb496b6942030bee3e05773cd7"
       }
     }
-  }
+  },
+  "tasks": {}
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Status Research & Development GmbH
+# Copyright (c) 2019-2024 Status Research & Development GmbH
 # Licensed under either of
 #  * Apache License, version 2.0, ([LICENSE-APACHE](LICENSE-APACHE))
 #  * MIT license ([LICENSE-MIT](LICENSE-MIT))
@@ -33,6 +33,8 @@ case upnp.selectIGD():
     quit(1)
   of IGDFound:
     echo "Internet Gateway Device found."
+  of IGDIpNotRoutable:
+    echo "Internet Gateway Device found and is connected, but with a reserved or non-routable IP. Trying anyway."
   of IGDNotConnected:
     echo "Internet Gateway Device found but it's not connected. Trying anyway."
   of NotAnIGD:
@@ -87,4 +89,3 @@ if res.isOk:
   echo "Port mapping number of entries: ", res.value
 else:
   echo &"getPortMappingNumberOfEntries() is not supported by this IGD. Error message: \"{res.error}\""
-
