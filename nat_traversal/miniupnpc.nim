@@ -968,28 +968,28 @@ proc selectIGD*(self: Miniupnp): SelectIGDResult =
 type SentReceivedResult = Result[culonglong, cstring]
 
 proc totalBytesSent*(self: Miniupnp): SentReceivedResult =
-  let res = UPNP_GetTotalBytesSent(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
+  let res = UPNP_GetTotalBytesSent(self.urls.controlURL_CIF, cast[cstring](addr(self.data.CIF.servicetype)))
   if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)
 
 proc totalBytesReceived*(self: Miniupnp): SentReceivedResult =
-  let res = UPNP_GetTotalBytesReceived(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
+  let res = UPNP_GetTotalBytesReceived(self.urls.controlURL_CIF, cast[cstring](addr(self.data.CIF.servicetype)))
   if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)
 
 proc totalPacketsSent*(self: Miniupnp): SentReceivedResult =
-  let res = UPNP_GetTotalPacketsSent(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
+  let res = UPNP_GetTotalPacketsSent(self.urls.controlURL_CIF, cast[cstring](addr(self.data.CIF.servicetype)))
   if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
     result.ok(res)
 
 proc totalPacketsReceived*(self: Miniupnp): SentReceivedResult =
-  let res = UPNP_GetTotalPacketsReceived(self.urls.controlURL_CIF, addr(self.data.CIF.servicetype))
+  let res = UPNP_GetTotalPacketsReceived(self.urls.controlURL_CIF, cast[cstring](addr(self.data.CIF.servicetype)))
   if res == cast[culonglong](UPNPCOMMAND_HTTP_ERROR):
     result.err(upnpError(res.cint))
   else:
@@ -1005,7 +1005,7 @@ proc statusInfo*(self: Miniupnp): Result[StatusInfo, cstring] =
   si.status.setLen(64)
   si.lastconnerror.setLen(64)
   let res = UPNP_GetStatusInfo(self.urls.controlURL,
-                                addr(self.data.first.servicetype),
+                                cast[cstring](addr(self.data.first.servicetype)),
                                 si.status.cstring,
                                 addr(si.uptime),
                                 si.lastconnerror.cstring)
@@ -1019,7 +1019,7 @@ proc statusInfo*(self: Miniupnp): Result[StatusInfo, cstring] =
 proc connectionType*(self: Miniupnp): Result[string, cstring] =
   var connType = newString(64)
   let res = UPNP_GetConnectionTypeInfo(self.urls.controlURL,
-                                        addr(self.data.first.servicetype),
+                                        cast[cstring](addr(self.data.first.servicetype)),
                                         connType.cstring)
   if res == UPNPCOMMAND_SUCCESS:
     trimString(connType)
@@ -1030,7 +1030,7 @@ proc connectionType*(self: Miniupnp): Result[string, cstring] =
 proc externalIPAddress*(self: Miniupnp): Result[string, cstring] =
   var externalIP = newString(40)
   let res = UPNP_GetExternalIPAddress(self.urls.controlURL,
-                                      addr(self.data.first.servicetype),
+                                      cast[cstring](addr(self.data.first.servicetype)),
                                       externalIP.cstring)
   if res == UPNPCOMMAND_SUCCESS:
     trimString(externalIP)
@@ -1057,7 +1057,7 @@ proc addPortMapping*(self: Miniupnp,
     # NULL pointer for the wrapped library.
     extIP = nil
   let res = UPNP_AddPortMapping(self.urls.controlURL,
-                                addr(self.data.first.servicetype),
+                                cast[cstring](addr(self.data.first.servicetype)),
                                 externalPort.cstring,
                                 internalPort.cstring,
                                 internalHost.cstring,
@@ -1086,7 +1086,7 @@ proc addAnyPortMapping*(self: Miniupnp,
     extIP = nil
   var reservedPort = newString(6)
   let res = UPNP_AddAnyPortMapping(self.urls.controlURL,
-                                addr(self.data.first.servicetype),
+                                cast[cstring](addr(self.data.first.servicetype)),
                                 externalPort.cstring,
                                 internalPort.cstring,
                                 internalHost.cstring,
@@ -1109,7 +1109,7 @@ proc deletePortMapping*(self: Miniupnp,
   if remoteHost == "":
     remHost = nil
   let res = UPNP_DeletePortMapping(self.urls.controlURL,
-                                    addr(self.data.first.servicetype),
+                                    cast[cstring](addr(self.data.first.servicetype)),
                                     externalPort.cstring,
                                     cstring($protocol),
                                     remHost)
@@ -1124,7 +1124,7 @@ proc deletePortMappingRange*(self: Miniupnp,
                               protocol: UPNPProtocol,
                               manage = false): Result[bool, cstring] =
   let res = UPNP_DeletePortMappingRange(self.urls.controlURL,
-                                    addr(self.data.first.servicetype),
+                                    cast[cstring](addr(self.data.first.servicetype)),
                                     externalPortStart.cstring,
                                     externalPortEnd.cstring,
                                     cstring($protocol),
@@ -1138,7 +1138,7 @@ proc deletePortMappingRange*(self: Miniupnp,
 proc getPortMappingNumberOfEntries*(self: Miniupnp): Result[cuint, cstring] =
   var numEntries: cuint
   let res = UPNP_GetPortMappingNumberOfEntries(self.urls.controlURL,
-                                                addr(self.data.first.servicetype),
+                                                cast[cstring](addr(self.data.first.servicetype)),
                                                 addr(numEntries))
   if res == UPNPCOMMAND_SUCCESS:
     result.ok(numEntries)
@@ -1173,7 +1173,7 @@ proc getSpecificPortMapping*(self: Miniupnp,
   if remoteHost == "":
     remHost = nil
   let res = UPNP_GetSpecificPortMappingEntry(self.urls.controlURL,
-                                              addr(self.data.first.servicetype),
+                                              cast[cstring](addr(self.data.first.servicetype)),
                                               externalPort.cstring,
                                               cstring($protocol),
                                               remHost,
@@ -1215,7 +1215,7 @@ proc getGenericPortMapping*(self: Miniupnp,
   portMapping.description.setLen(80)
   portMapping.remoteHost.setLen(64)
   let res = UPNP_GetGenericPortMappingEntry(self.urls.controlURL,
-                                            addr(self.data.first.servicetype),
+                                            cast[cstring](addr(self.data.first.servicetype)),
                                             cstring($index),
                                             portMapping.externalPort.cstring,
                                             portMapping.internalClient.cstring,
