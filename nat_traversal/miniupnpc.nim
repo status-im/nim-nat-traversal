@@ -400,6 +400,39 @@ proc UPNP_GetSpecificPortMappingEntry*(
 ): cint {.
     importc: "UPNP_GetSpecificPortMappingEntry", header: "upnpcommands.h".}
 
+##  retrieves an existing port mapping for a port:protocol
+##
+##  List of possible UPnP errors for UPNP_GetSpecificPortMappingEntry() :
+##  errorCode errorDescription (short) | Description (long)
+##  ---------------------------------- | ------------------
+##  402 Invalid Args | See UPnP Device Architecture section on Control.
+##  501 Action Failed | See UPnP Device Architecture section on Control.
+##  606 Action not authorized | The action requested REQUIRES authorization and the sender was not authorized.
+##  714 NoSuchEntryInArray | The specified value does not exist in the array.
+##
+##  \param[in] controlURL controlURL of the WANIPConnection of a WANConnectionDevice
+##  \param[in] servicetype urn:schemas-upnp-org:service:WANIPConnection:1
+##  \param[in] extPort External port
+##  \param[in] proto `TCP` or `UDP`
+##  \param[in] remoteHost IP or empty string for wildcard. Most IGD don't
+##             support it
+##  \param[out] intClient 16 bytes buffer
+##  \param[out] intPort 6 bytes buffer
+##  \param[out] desc desclen bytes buffer
+##  \param[in] desclen desc buffer length
+##  \param[out] enabled 4 bytes buffer
+##  \param[out] leaseDuration 16 bytes
+##  \return #UPNPCOMMAND_SUCCESS, #UPNPCOMMAND_INVALID_ARGS,
+##          #UPNPCOMMAND_UNKNOWN_ERROR or a UPnP Error Code.
+proc UPNP_GetSpecificPortMappingEntryExt*(
+    controlURL: cstring; servicetype: cstring;
+    extPort: cstring; proto: cstring;
+    remoteHost: cstring; intClient: cstring;
+    intPort: cstring; desc: cstring; desclen: csize_t;
+    enabled: cstring; leaseDuration: cstring
+): cint {.
+    importc: "UPNP_GetSpecificPortMappingEntryExt", header: "upnpcommands.h".}
+
 ##  WANIPConnection:GetGenericPortMappingEntry()
 ##
 ##  errorCode errorDescription (short) | Description (long)
@@ -429,6 +462,39 @@ proc UPNP_GetGenericPortMappingEntry*(
     enabled: cstring; rHost: cstring;
     duration: cstring
 ): cint {.importc: "UPNP_GetGenericPortMappingEntry", header: "upnpcommands.h".}
+
+##  WANIPConnection:GetGenericPortMappingEntry()
+##
+##  errorCode errorDescription (short) | Description (long)
+##  ---------------------------------- | ------------------
+##  402 Invalid Args | See UPnP Device Architecture section on Control.
+##  606 Action not authorized | The action requested REQUIRES authorization and the sender was not authorized.
+##  713 SpecifiedArrayIndexInvalid | The specified array index is out of bounds
+##
+##  \param[in] controlURL controlURL of the WANIPConnection of a WANConnectionDevice
+##  \param[in] servicetype urn:schemas-upnp-org:service:WANIPConnection:1
+##  \param[in] index
+##  \param[out] extPort 6 bytes buffer
+##  \param[out] intClient 16 bytes buffer
+##  \param[out] intPort 6 bytes buffer
+##  \param[out] protocol 4 bytes buffer
+##  \param[out] desc desclen bytes buffer
+##  \param[in] desclen desc buffer length
+##  \param[out] enabled 4 bytes buffer
+##  \param[out] rHost desclen bytes buffer
+##  \param[in] rHostlen rHost buffer length
+##  \param[out] duration 16 bytes buffer
+##  \return #UPNPCOMMAND_SUCCESS, #UPNPCOMMAND_INVALID_ARGS,
+##          #UPNPCOMMAND_UNKNOWN_ERROR or a UPnP Error Code.
+proc UPNP_GetGenericPortMappingEntryExt*(
+    controlURL: cstring; servicetype: cstring;
+    index: cstring; extPort: cstring;
+    intClient: cstring; intPort: cstring;
+    protocol: cstring; desc: cstring; desclen: csize_t;
+    enabled: cstring; rHost: cstring; rHostlen: csize_t;
+    duration: cstring
+): cint {.
+    importc: "UPNP_GetGenericPortMappingEntryExt", header: "upnpcommands.h".}
 
 ##   retrieval of a list of existing port mappings
 ##
@@ -694,6 +760,8 @@ type
 
 ##  execute a UPnP method (SOAP action)
 ##
+##  \todo error reporting should be improved
+##
 ##  \param[in] url Control URL for the service
 ##  \param[in] service service to use
 ##  \param[in] action action to call
@@ -863,7 +931,7 @@ proc UPNP_GetIGDFromUrl*(
 ##  free the members of a UPNPUrls struct
 ##
 ##  All URLs buffers are freed and zeroed
-##  \param[out] urls
+##  \param[out] urls URL structure to free
 proc freeUPNPUrls*(
     a1: ptr UPNPUrls) {.importc: "FreeUPNPUrls", header: "miniupnpc.h".}
 
@@ -905,7 +973,7 @@ proc close*(x: Miniupnp) =
     freeUPNPUrls(addr(x.urls))
 
 proc newMiniupnp*(): Miniupnp =
-  doAssert MINIUPNPC_API_VERSION == 20
+  doAssert MINIUPNPC_API_VERSION == 21
   new(result)
   result.ttl = 2.uint8
 
@@ -1155,33 +1223,38 @@ type PortMappingRes* = object
   remoteHost*: string
   leaseDuration*: uint64
 
-proc getSpecificPortMapping*(self: Miniupnp,
-                              externalPort: string,
-                              protocol: UPNPProtocol,
-                              remoteHost = ""): Result[PortMappingRes, cstring] =
+proc getSpecificPortMapping*(
+    self: Miniupnp,
+    externalPort: string,
+    protocol: UPNPProtocol,
+    remoteHost = ""): Result[PortMappingRes, cstring] =
   var
-    portMapping = PortMappingRes(externalPort: externalPort,
-                                  protocol: protocol,
-                                  remoteHost: remoteHost)
+    portMapping = PortMappingRes(
+      externalPort: externalPort,
+      protocol: protocol,
+      remoteHost: remoteHost)
     enabledStr = newString(4)
     leaseDurationStr = newString(16)
 
-  portMapping.internalClient.setLen(40)
+  portMapping.internalClient.setLen(16)
   portMapping.internalPort.setLen(6)
-  portMapping.description.setLen(80)
+  const desclen = 80
+  portMapping.description.setLen(desclen)
   var remHost = remoteHost.cstring
   if remoteHost == "":
     remHost = nil
-  let res = UPNP_GetSpecificPortMappingEntry(self.urls.controlURL,
-                                              cast[cstring](addr(self.data.first.servicetype)),
-                                              externalPort.cstring,
-                                              cstring($protocol),
-                                              remHost,
-                                              portMapping.internalClient.cstring,
-                                              portMapping.internalPort.cstring,
-                                              portMapping.description.cstring,
-                                              enabledStr.cstring,
-                                              leaseDurationStr.cstring)
+  let res = UPNP_GetSpecificPortMappingEntryExt(
+    self.urls.controlURL,
+    cast[cstring](addr(self.data.first.servicetype)),
+    externalPort.cstring,
+    cstring($protocol),
+    remHost,
+    portMapping.internalClient.cstring,
+    portMapping.internalPort.cstring,
+    portMapping.description.cstring,
+    desclen,
+    enabledStr.cstring,
+    leaseDurationStr.cstring)
   if res == UPNPCOMMAND_SUCCESS:
     trimString(portMapping.internalClient)
     trimString(portMapping.internalPort)
@@ -1201,8 +1274,9 @@ proc getSpecificPortMapping*(self: Miniupnp,
   else:
     result.err(upnpError(res))
 
-proc getGenericPortMapping*(self: Miniupnp,
-                            index: int): Result[PortMappingRes, cstring] =
+proc getGenericPortMapping*(
+    self: Miniupnp,
+    index: int): Result[PortMappingRes, cstring] =
   var
     portMapping: PortMappingRes
     protocolStr = newString(4)
@@ -1210,21 +1284,26 @@ proc getGenericPortMapping*(self: Miniupnp,
     leaseDurationStr = newString(16)
 
   portMapping.externalPort.setLen(6)
-  portMapping.internalClient.setLen(40)
+  portMapping.internalClient.setLen(16)
   portMapping.internalPort.setLen(6)
-  portMapping.description.setLen(80)
-  portMapping.remoteHost.setLen(64)
-  let res = UPNP_GetGenericPortMappingEntry(self.urls.controlURL,
-                                            cast[cstring](addr(self.data.first.servicetype)),
-                                            cstring($index),
-                                            portMapping.externalPort.cstring,
-                                            portMapping.internalClient.cstring,
-                                            portMapping.internalPort.cstring,
-                                            protocolStr.cstring,
-                                            portMapping.description.cstring,
-                                            enabledStr.cstring,
-                                            portMapping.remoteHost.cstring,
-                                            leaseDurationStr.cstring)
+  const desclen = 80
+  portMapping.description.setLen(desclen)
+  const rHostlen = 64
+  portMapping.remoteHost.setLen(rHostlen)
+  let res = UPNP_GetGenericPortMappingEntryExt(
+    self.urls.controlURL,
+    cast[cstring](addr(self.data.first.servicetype)),
+    cstring($index),
+    portMapping.externalPort.cstring,
+    portMapping.internalClient.cstring,
+    portMapping.internalPort.cstring,
+    protocolStr.cstring,
+    portMapping.description.cstring,
+    desclen,
+    enabledStr.cstring,
+    portMapping.remoteHost.cstring,
+    rHostlen,
+    leaseDurationStr.cstring)
   if res == UPNPCOMMAND_SUCCESS:
     trimString(portMapping.externalPort)
     trimString(portMapping.internalClient)
