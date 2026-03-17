@@ -12,7 +12,7 @@
 
 {.push raises: [Defect].}
 
-import os, strutils
+import os, strutils, net
 when defined(windows):
   import winlean
 else:
@@ -224,6 +224,16 @@ proc init*(self: NatPmp): Result[bool, cstring] =
     result.ok(true)
   else:
     result.err(strnatpmperr(res))
+
+proc init*(self: NatPmp, gateway: IpAddress): Result[bool, cstring] =
+  if gateway.family != IpAddressFamily.IPv4:
+    result.err("gateway address invalid, should be IPv4")
+  else:
+    let res = initnatpmp(addr(self.cstruct), 1, cast[culong](gateway.address_v4))
+    if res == 0:
+      result.ok(true)
+    else:
+      result.err(strnatpmperr(res))
 
 proc `=deepCopy`(x: NatPmp): NatPmp =
   doAssert(false, "not implemented")
