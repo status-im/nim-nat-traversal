@@ -30,6 +30,14 @@ proc compileStaticLibraries() =
     else:
       exec("make CFLAGS=\"-Wall -Os -fPIC -DENABLE_STRNATPMPERR -DNATPMP_MAX_RETRIES=4\" libnatpmp.a")
 
+  withDir "vendor/libpcpnatpmp":
+    when defined(windows):
+      exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G \"MinGW Makefiles\"")
+      exec("cmake --build build --target pcpnatpmp -- -j2")
+    else:
+      exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release")
+      exec("cmake --build build --target pcpnatpmp -- -j2")
+
 task buildBundledLibs, "build bundled libraries":
   compileStaticLibraries()
 

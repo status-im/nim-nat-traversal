@@ -8,3 +8,8 @@
 	url = https://github.com/miniupnp/libnatpmp.git
 	ignore = dirty
 	branch = master
+[submodule "vendor/libpcpnatpmp"]
+	path = vendor/libpcpnatpmp
+	url = https://github.com/libpcpnatpmp/libpcpnatpmp
+	ignore = dirty
+	branch = master
