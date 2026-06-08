@@ -10,6 +10,6 @@
 	branch = master
 [submodule "vendor/libpcpnatpmp"]
 	path = vendor/libpcpnatpmp
-	url = https://github.com/libpcpnatpmp/libpcpnatpmp
+	url = https://github.com/moigagoo/libpcpnatpmp
 	ignore = dirty
-	branch = master
+	branch = fix/llvm-mingw-windows-build

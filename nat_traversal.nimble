@@ -32,12 +32,7 @@ proc compileStaticLibraries() =
 
   withDir "vendor/libpcpnatpmp":
     when defined(windows):
-      # -DHAVE_GETTIMEOFDAY skips pcp_gettimeofday.c which redefines struct
-      # timezone already present in llvm-mingw's time.h.
-      # -Dcmsghdr=WSACMSGHDR maps the POSIX cmsghdr name to its Windows
-      # equivalent since llvm-mingw does not provide the alias.
-      exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G \"MinGW Makefiles\"" &
-           " -DCMAKE_C_FLAGS=\"-DHAVE_GETTIMEOFDAY -Dcmsghdr=WSACMSGHDR\"")
+      exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G \"MinGW Makefiles\"")
       exec("cmake --build build --target pcpnatpmp -- -j2")
     else:
       exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release")
