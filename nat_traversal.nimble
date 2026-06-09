@@ -32,7 +32,11 @@ proc compileStaticLibraries() =
 
   withDir "vendor/libpcpnatpmp":
     when defined(windows):
-      exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G \"MinGW Makefiles\"")
+      # _WIN32_WINNT=0x0600 (Vista+) is required: the library uses socket
+      # ancillary-data APIs (cmsghdr, CMSG_FIRSTHDR, GetIpForwardTable2 ...)
+      # that are only available from Vista onwards.
+      exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G \"MinGW Makefiles\"" &
+           " -DCMAKE_C_FLAGS=\"-D_WIN32_WINNT=0x0600\"")
       exec("cmake --build build --target pcpnatpmp -- -j2")
     else:
       exec("cmake -S . -B build -DCMAKE_BUILD_TYPE=Release")
