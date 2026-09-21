@@ -26,8 +26,12 @@ else:
     includeFlag = "-I" & miniupnpcPath & "/include"
     # The Makefiles of the miniupnp library have an inconsistency
     # where the output path is different on Windows:
-    buildOutputDir = when defined(windows): ""
-                      else: "/build"
+    defaultBuildOutputDir = when defined(windows): ""
+                            else: "/build"
+    # ...and which Makefile ran is a property of the BUILD host, not the target:
+    # cross-compiling to Windows uses the POSIX one, which writes to build/.
+    # -d:miniupnpcBuildDir=/build then points here at the archive that exists.
+    buildOutputDir {.strdefine: "miniupnpcBuildDir".} = defaultBuildOutputDir
     libraryPath = miniupnpcPath & buildOutputDir & "/libminiupnpc.a"
   {.passc: includeFlag.}
   # We can't use the {.link.} pragma in here, because it would place the static
