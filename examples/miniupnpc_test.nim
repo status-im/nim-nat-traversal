@@ -40,7 +40,7 @@ case upnp.selectIGD():
   of NotAnIGD:
     echo "Some device found, but it's not recognised as an Internet Gateway Device. Trying anyway."
 
-echo "Local ip address: ", upnp.lanaddr
+echo "Local ip address: ", upnp.lanAddr
 var externalIP: string
 checkError upnp.externalIPAddress():
   externalIP = res.value
