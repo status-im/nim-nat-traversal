@@ -1,4 +1,5 @@
 nimcache/
+build/
 
 # Ignore dynamic, static libs and libtool archive files
 *.so
