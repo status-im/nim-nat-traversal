@@ -1,4 +1,4 @@
-import macros
+import std/macros
 
 # https://github.com/nim-lang/Nim/issues/4441#issuecomment-230441949
 macro importConst*(cname: untyped, cheader: string, ctype: untyped): untyped =

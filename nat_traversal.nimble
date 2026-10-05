@@ -1,14 +1,14 @@
 mode = ScriptMode.Verbose
 
 packageName   = "nat_traversal"
-version       = "0.0.1"
+version       = "0.1.0"
 author        = "Status Research & Development GmbH"
 description   = "miniupnpc and libnatpmp wrapper"
 license       = "Apache License 2.0 or MIT"
 installDirs   = @["vendor"]
 
 ### Dependencies
-requires "nim >= 1.6.0",
+requires "nim >= 1.6.16",
          "results"
 
 let nimc = getEnv("NIMC", "nim") # Which nim compiler to use
