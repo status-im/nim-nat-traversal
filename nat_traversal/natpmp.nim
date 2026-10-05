@@ -10,9 +10,9 @@
 # headers and library location #
 ################################
 
-{.push raises: [Defect].}
+{.push raises: [].}
 
-import os, strutils
+import std/[os, strutils]
 when defined(windows):
   import winlean
 else:

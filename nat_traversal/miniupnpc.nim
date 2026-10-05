@@ -10,7 +10,7 @@
 # headers and library location #
 ################################
 
-{.push raises: [Defect].}
+{.push raises: [].}
 
 import std/strutils,
       ./utils

@@ -6,7 +6,7 @@
 # This file may not be copied, modified, or distributed except according to
 # those terms.
 
-import nat_traversal/natpmp, strformat
+import nat_traversal/natpmp, std/strformat
 
 template checkError(expr, body: untyped): untyped =
   block:
